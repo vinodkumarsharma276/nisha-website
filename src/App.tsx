@@ -1,5 +1,6 @@
 import Header from './components/Header';
 import Home from './components/Home';
+import Services from './components/Services';
 import Blogs from './components/Blogs';
 import Projects from './components/Projects';
 import Experience from './components/Experience';
@@ -11,6 +12,7 @@ function App() {
       <Header />
       <main>
         <Home />
+        <Services />
         <Blogs />
         <Projects />
         <Experience />

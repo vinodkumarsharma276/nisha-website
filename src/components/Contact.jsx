@@ -13,10 +13,10 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const backgroundImages = [
-    'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80', // Modern office
-    'https://images.unsplash.com/photo-1497366411874-3415097a27e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80', // Business meeting
-    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80', // Corporate building
-    'https://images.unsplash.com/photo-1664575602276-acd073f104c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'  // Professional workspace
+    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80', // Professional businesswoman
+    'https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80', // Female financial analyst
+    'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80', // Modern office (neutral)
+    'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'  // Professional woman working
   ];
 
   const contactMethods = [
