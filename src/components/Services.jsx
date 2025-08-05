@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { FileText, Shield, Receipt, Building, CheckCircle, ArrowRight, Star, Users, Clock, Award, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { FileText, Shield, Receipt, Building, CheckCircle, ArrowRight, Star, Users, Clock, Award } from 'lucide-react';
 
 const backgroundImages = [
   'https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', // Office workspace (neutral)
@@ -93,8 +93,7 @@ const whyChooseUs = [
 const Services = () => {
   const [currentBg, setCurrentBg] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(services.length); // Start from second set
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -117,16 +116,36 @@ const Services = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Auto-play carousel
+  // Infinite auto-play carousel with proper looping
   useEffect(() => {
-    if (!isAutoPlaying) return;
-    
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % services.length);
-    }, 4000);
+      setCurrentSlide((prev) => {
+        // Reset to start of second set when reaching end of second set
+        if (prev >= services.length * 2 - 1) {
+          return services.length;
+        }
+        return prev + 1;
+      });
+    }, 3000);
     
     return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+  }, []);
+
+  // Handle seamless loop transition
+  useEffect(() => {
+    // When we reach the end of the third set, instantly jump to start of second set
+    if (currentSlide >= services.length * 3) {
+      setTimeout(() => {
+        setCurrentSlide(services.length);
+      }, 50);
+    }
+    // When we go before the first set, instantly jump to end of second set
+    else if (currentSlide < 0) {
+      setTimeout(() => {
+        setCurrentSlide(services.length * 2 - 1);
+      }, 50);
+    }
+  }, [currentSlide]);
 
   const handleGetStarted = () => {
     // Scroll to contact section when Get Started is clicked
@@ -136,25 +155,12 @@ const Services = () => {
     }
   };
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % services.length);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000); // Resume auto-play after 10 seconds
+  const goToSlide = (index) => {
+    // Jump to the corresponding position in the second set
+    setCurrentSlide(index + services.length);
   };
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + services.length) % services.length);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000); // Resume auto-play after 10 seconds
-  };
-
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000); // Resume auto-play after 10 seconds
-  };
-
-  // Calculate transform for showing 2.2 cards
+  // Calculate transform for infinite scroll with 2.2 cards visible
   const getTransform = () => {
     const cardWidth = 100 / 2.2; // Show 2.2 cards
     return `translateX(-${currentSlide * cardWidth}%)`;
@@ -200,48 +206,31 @@ const Services = () => {
           </p>
         </div>
 
-        {/* Services Carousel */}
-        <div className="relative mb-16 group">
-          {/* Navigation Arrows - Only visible on hover */}
-          <button
-            onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-white/20 backdrop-blur-lg p-3 rounded-full border border-white/30 hover:bg-white/30 transition-all duration-300 transform hover:scale-110 carousel-arrow-left opacity-0 group-hover:opacity-100"
-            onMouseEnter={() => setIsAutoPlaying(false)}
-            onMouseLeave={() => setIsAutoPlaying(true)}
-          >
-            <ChevronLeft className="w-6 h-6 text-white hover:text-blue-300 transition-colors duration-300" />
-          </button>
-          
-          <button
-            onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-white/20 backdrop-blur-lg p-3 rounded-full border border-white/30 hover:bg-white/30 transition-all duration-300 transform hover:scale-110 carousel-arrow-right opacity-0 group-hover:opacity-100"
-            onMouseEnter={() => setIsAutoPlaying(false)}
-            onMouseLeave={() => setIsAutoPlaying(true)}
-          >
-            <ChevronRight className="w-6 h-6 text-white hover:text-blue-300 transition-colors duration-300" />
-          </button>
-
+        {/* Services Carousel - Infinite */}
+        <div className="relative mb-16">
           {/* Carousel Container */}
           <div className="overflow-hidden rounded-2xl">
             <div 
-              className="flex transition-transform duration-500 ease-in-out"
-              style={{ transform: getTransform() }}
+              className="flex transition-transform duration-1000 ease-linear"
+              style={{ 
+                transform: getTransform(),
+                transitionDuration: currentSlide >= services.length * 3 || currentSlide < 0 ? '0ms' : '1000ms'
+              }}
             >
-              {services.map((service) => (
+              {/* Render services multiple times for infinite effect */}
+              {[...services, ...services, ...services].map((service, index) => (
                 <div
-                  key={service.id}
+                  key={`${service.id}-${index}`}
                   className="flex-shrink-0 px-3"
                   style={{ width: `${100 / 2.2}%` }}
-                  onMouseEnter={() => setIsAutoPlaying(false)}
-                  onMouseLeave={() => setIsAutoPlaying(true)}
                 >
-                  <div className={`group/card bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl ${
+                  <div className={`group/card bg-white/10 backdrop-blur-lg p-5 rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl ${
                     isVisible ? 'animate-slide-up' : 'opacity-0'
-                  } h-96`}>
+                  } h-80`}>
                     {/* Service Header */}
-                    <div className="flex items-center space-x-4 mb-4">
+                    <div className="flex items-center space-x-3 mb-4">
                       <div className={`p-3 rounded-xl ${service.bgColor} ${service.borderColor} border-2 group-hover/card:scale-110 transition-transform duration-300`}>
-                        <service.icon className="w-6 h-6 text-white" />
+                        <service.icon className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
                         <h3 className="text-lg font-bold text-white mb-1">{service.title}</h3>
@@ -269,7 +258,7 @@ const Services = () => {
                     </div>
 
                     {/* Service Details - Compact */}
-                    <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="grid grid-cols-2 gap-2 mb-4">
                       <div>
                         <p className="text-xs text-gray-400 mb-1">Starting Price</p>
                         <p className="text-sm font-semibold text-green-400">{service.price}</p>
@@ -295,27 +284,27 @@ const Services = () => {
           </div>
 
           {/* Pagination Dots */}
-          <div className="flex justify-center space-x-2 mt-6">
+          <div className="flex justify-center space-x-3 mt-8">
             {services.map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentSlide 
-                    ? 'bg-white shadow-lg' 
+                className={`w-3 h-3 rounded-full transition-all duration-300 hover:scale-125 ${
+                  (currentSlide % services.length) === index 
+                    ? 'bg-white shadow-lg scale-110' 
                     : 'bg-white/40 hover:bg-white/60'
                 }`}
-                onMouseEnter={() => setIsAutoPlaying(false)}
-                onMouseLeave={() => setIsAutoPlaying(true)}
+                title={services[index].title}
               />
             ))}
           </div>
 
-          {/* Auto-play Indicator */}
-          <div className="flex justify-center mt-4">
-            <div className={`text-xs text-gray-400 flex items-center space-x-2 ${isAutoPlaying ? 'opacity-100' : 'opacity-50'}`}>
-              <div className={`w-2 h-2 rounded-full ${isAutoPlaying ? 'bg-green-400 animate-pulse-glow' : 'bg-gray-400'}`}></div>
-              <span>{isAutoPlaying ? 'Auto-playing' : 'Paused - Hover to control'}</span>
+          {/* Service Names Below Dots */}
+          <div className="flex justify-center mt-3">
+            <div className="text-sm text-gray-400 text-center">
+              <span className="font-medium text-white">
+                {services[(currentSlide % services.length)].title}
+              </span>
             </div>
           </div>
         </div>
@@ -327,13 +316,13 @@ const Services = () => {
             {whyChooseUs.map((item, index) => (
               <div
                 key={index}
-                className="text-center p-6 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:scale-105"
+                className="text-center p-6 bg-white/20 backdrop-blur-lg rounded-2xl border border-white/30 hover:bg-white/30 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
               >
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4 shadow-lg">
                   <item.icon className="w-8 h-8 text-white" />
                 </div>
                 <h4 className="text-xl font-semibold text-white mb-2">{item.title}</h4>
-                <p className="text-gray-300 text-sm">{item.description}</p>
+                <p className="text-gray-200 text-sm">{item.description}</p>
               </div>
             ))}
           </div>

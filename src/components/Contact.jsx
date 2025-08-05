@@ -150,14 +150,14 @@ const Contact = () => {
             {achievements.map((achievement, index) => (
               <div
                 key={index}
-                className={`text-center p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 ${
+                className={`text-center p-4 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-all duration-300 shadow-lg hover:shadow-xl ${
                   isVisible ? 'animate-slide-up' : 'opacity-0'
                 }`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <achievement.icon className="w-8 h-8 text-blue-400 mx-auto mb-2" />
                 <p className="text-2xl font-bold text-white">{achievement.count}</p>
-                <p className="text-sm text-gray-300">{achievement.text}</p>
+                <p className="text-sm text-gray-200">{achievement.text}</p>
               </div>
             ))}
           </div>
@@ -166,7 +166,7 @@ const Contact = () => {
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Contact Form */}
           <div className={`${isVisible ? 'animate-slide-in-left' : 'opacity-0'}`}>
-            <div className="bg-white/10 backdrop-blur-lg p-8 rounded-2xl border border-white/20 shadow-2xl">
+            <div className="bg-white/20 backdrop-blur-lg p-8 rounded-2xl border border-white/30 shadow-2xl">
               <div className="flex items-center mb-6">
                 <MessageSquare className="w-8 h-8 text-blue-400 mr-3" />
                 <h3 className="text-2xl font-bold text-white">Send a Message</h3>
@@ -247,19 +247,19 @@ const Contact = () => {
               {contactMethods.map((method, index) => (
                 <div
                   key={index}
-                  className={`bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:scale-105 ${
+                  className={`bg-white/20 backdrop-blur-lg p-6 rounded-2xl border border-white/30 hover:bg-white/30 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl ${
                     isVisible ? 'animate-slide-up' : 'opacity-0'
                   }`}
                   style={{ animationDelay: method.delay }}
                 >
                   <div className="flex items-start space-x-4">
-                    <div className={`p-3 rounded-xl bg-${method.color}-500/20`}>
+                    <div className={`p-3 rounded-xl bg-${method.color}-500/30 shadow-lg`}>
                       <method.icon className={`w-6 h-6 text-${method.color}-400`} />
                     </div>
                     <div className="flex-1">
                       <h4 className="text-xl font-semibold text-white mb-1">{method.title}</h4>
                       <p className="text-lg text-blue-300 font-medium">{method.content}</p>
-                      <p className="text-sm text-gray-400">{method.description}</p>
+                      <p className="text-sm text-gray-200">{method.description}</p>
                     </div>
                   </div>
                 </div>
@@ -267,7 +267,7 @@ const Contact = () => {
             </div>
 
             {/* Social Media */}
-            <div className="bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-white/20">
+            <div className="bg-white/20 backdrop-blur-lg p-6 rounded-2xl border border-white/30 shadow-lg">
               <h4 className="text-xl font-semibold text-white mb-4 flex items-center">
                 <Globe className="w-6 h-6 mr-2 text-blue-400" />
                 Connect on Social Media
@@ -277,7 +277,7 @@ const Contact = () => {
                   <a
                     key={index}
                     href="#"
-                    className={`p-3 rounded-xl bg-${social.color}-500/20 hover:bg-${social.color}-500/40 transition-all duration-300 transform hover:scale-110`}
+                    className={`p-3 rounded-xl bg-${social.color}-500/30 hover:bg-${social.color}-500/50 transition-all duration-300 transform hover:scale-110 shadow-md`}
                     aria-label={social.label}
                   >
                     <social.icon className={`w-6 h-6 text-${social.color}-400`} />
@@ -287,12 +287,12 @@ const Contact = () => {
             </div>
 
             {/* Business Hours */}
-            <div className="bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-white/20">
+            <div className="bg-white/20 backdrop-blur-lg p-6 rounded-2xl border border-white/30 shadow-lg">
               <h4 className="text-xl font-semibold text-white mb-4 flex items-center">
                 <Calendar className="w-6 h-6 mr-2 text-green-400" />
                 Business Hours
               </h4>
-              <div className="space-y-2 text-gray-300">
+              <div className="space-y-2 text-gray-200">
                 <div className="flex justify-between">
                   <span>Monday - Friday</span>
                   <span className="text-green-400">9:00 AM - 6:00 PM</span>

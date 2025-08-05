@@ -15,6 +15,7 @@ const Header = () => {
         
         <nav>
           <a href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('home'); }} className="mx-4 hover:text-gray-300 underline-offset-4 hover:underline">Home</a>
+          <a href="#services" onClick={(e) => { e.preventDefault(); scrollToSection('services'); }} className="mx-4 hover:text-gray-300 underline-offset-4 hover:underline">Services</a>
           <a href="#blogs" onClick={(e) => { e.preventDefault(); scrollToSection('blogs'); }} className="mx-4 hover:text-gray-300 underline-offset-4 hover:underline">Blogs</a>
           <a href="#projects" onClick={(e) => { e.preventDefault(); scrollToSection('projects'); }} className="mx-4 hover:text-gray-300 underline-offset-4 hover:underline">Projects</a>
           <a href="#experience" onClick={(e) => { e.preventDefault(); scrollToSection('experience'); }} className="mx-4 hover:text-gray-300 underline-offset-4 hover:underline">Experience</a>
