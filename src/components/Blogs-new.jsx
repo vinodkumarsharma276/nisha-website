@@ -52,34 +52,27 @@ const Blogs = () => {
   const getCategoryColor = (category) => {
     switch (category) {
       case 'Tax Law':
-        return 'bg-gradient-to-r from-purple-100 to-violet-100 text-purple-700 border-purple-200';
+        return 'bg-slate-100 text-slate-700 border-slate-200';
       case 'Business Finance':
-        return 'bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 border-indigo-200';
+        return 'bg-gray-100 text-gray-700 border-gray-200';
       case 'Personal Finance':
-        return 'bg-gradient-to-r from-violet-100 to-fuchsia-100 text-violet-700 border-violet-200';
+        return 'bg-stone-100 text-stone-700 border-stone-200';
       default:
-        return 'bg-gradient-to-r from-purple-100 to-violet-100 text-purple-700 border-purple-200';
+        return 'bg-slate-100 text-slate-700 border-slate-200';
     }
   };
 
   return (
-    <section id="blogs" className="py-20 relative overflow-hidden bg-gradient-to-br from-violet-50/80 via-purple-50/60 to-fuchsia-50/40">
-      {/* Floating Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-20 h-20 bg-gradient-to-br from-purple-400/20 to-violet-400/20 rounded-full animate-float"></div>
-        <div className="absolute top-32 right-20 w-16 h-16 bg-gradient-to-br from-indigo-400/20 to-purple-400/20 rounded-full animate-float-delayed"></div>
-        <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-gradient-to-br from-violet-400/20 to-fuchsia-400/20 rounded-full animate-float-slow"></div>
-        <div className="absolute bottom-32 right-1/3 w-18 h-18 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full animate-float"></div>
-      </div>
+    <section id="blogs" className="py-20 bg-slate-50">
       <div className="container mx-auto px-6">
         {/* Header Section */}
-        <div className={`text-center mb-16 relative z-10 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
-          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-100 to-violet-100 text-purple-700 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-purple-200/50 backdrop-blur-sm">
+        <div className={`text-center mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
+          <div className="inline-flex items-center space-x-2 bg-slate-100 text-slate-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
             <BookOpen className="w-4 h-4" />
             <span>Financial Insights</span>
           </div>
           
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-800 via-violet-700 to-indigo-800 bg-clip-text text-transparent mb-4">
+          <h2 className="text-4xl font-bold text-slate-800 mb-4">
             Latest Blogs & Articles
           </h2>
           <p className="text-lg text-slate-600 max-w-3xl mx-auto">
@@ -88,53 +81,51 @@ const Blogs = () => {
         </div>
 
         {/* Blog Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {blogs.map((blog, index) => (
             <article
               key={index}
-              className={`group bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200/50 hover:border-violet-300/70 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 transform hover:scale-105 cursor-pointer overflow-hidden ${
+              className={`group bg-white rounded-xl border border-gray-200 hover:border-slate-300 hover:shadow-lg transition-all duration-300 transform hover:scale-105 cursor-pointer ${
                 isVisible ? 'animate-slide-up' : 'opacity-0'
               }`}
               style={{ animationDelay: `${index * 0.2}s` }}
               onClick={() => setSelectedBlog(blog)}
             >
               {/* Blog Header */}
-              <div className="p-6 border-b border-purple-100/50 relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-50/30 to-violet-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="flex items-center justify-between mb-4 relative z-10">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium border backdrop-blur-sm ${getCategoryColor(blog.category)}`}>
+              <div className="p-6 border-b border-gray-100">
+                <div className="flex items-center justify-between mb-4">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getCategoryColor(blog.category)}`}>
                     {blog.category}
                   </span>
-                  <div className="flex items-center text-xs text-purple-600/70">
+                  <div className="flex items-center text-xs text-slate-500">
                     <Eye className="w-3 h-3 mr-1" />
                     {blog.views}
                   </div>
                 </div>
                 
-                <h3 className="text-xl font-bold text-slate-800 mb-3 line-clamp-2 group-hover:text-purple-800 transition-colors leading-tight relative z-10">
+                <h3 className="text-xl font-bold text-slate-800 mb-3 line-clamp-2 group-hover:text-slate-700 transition-colors leading-tight">
                   {blog.title}
                 </h3>
                 
-                <p className="text-slate-600 text-sm line-clamp-3 mb-4 relative z-10">
+                <p className="text-slate-600 text-sm line-clamp-3 mb-4">
                   {blog.excerpt}
                 </p>
               </div>
 
               {/* Blog Footer */}
-              <div className="p-6 relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-50/20 to-purple-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="flex items-center justify-between text-xs text-slate-500 mb-4 relative z-10">
+              <div className="p-6">
+                <div className="flex items-center justify-between text-xs text-slate-500 mb-4">
                   <div className="flex items-center">
-                    <Calendar className="w-3 h-3 mr-1 text-purple-500" />
+                    <Calendar className="w-3 h-3 mr-1" />
                     {blog.date}
                   </div>
                   <div className="flex items-center">
-                    <Clock className="w-3 h-3 mr-1 text-violet-500" />
+                    <Clock className="w-3 h-3 mr-1" />
                     {blog.readTime}
                   </div>
                 </div>
                 
-                <button className="group/btn flex items-center text-purple-700 font-medium text-sm hover:text-violet-800 transition-all duration-300 relative z-10">
+                <button className="group/btn flex items-center text-slate-700 font-medium text-sm hover:text-slate-800 transition-all duration-300">
                   Read Article
                   <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
                 </button>
@@ -145,44 +136,44 @@ const Blogs = () => {
 
         {/* Blog Modal */}
         {selectedBlog && (
-          <div className="fixed inset-0 bg-gradient-to-br from-purple-900/50 via-violet-900/50 to-indigo-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setSelectedBlog(null)}>
-            <div className="bg-white/95 backdrop-blur-lg rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-purple-200/50" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedBlog(null)}>
+            <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200" onClick={(e) => e.stopPropagation()}>
               {/* Modal Header */}
-              <div className="sticky top-0 bg-white/90 backdrop-blur-lg border-b border-purple-200/50 p-6 flex items-center justify-between">
+              <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium border backdrop-blur-sm ${getCategoryColor(selectedBlog.category)}`}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getCategoryColor(selectedBlog.category)}`}>
                     {selectedBlog.category}
                   </span>
-                  <div className="flex items-center text-xs text-purple-600/70">
+                  <div className="flex items-center text-xs text-slate-500">
                     <Eye className="w-3 h-3 mr-1" />
                     {selectedBlog.views}
                   </div>
                 </div>
                 <button
                   onClick={() => setSelectedBlog(null)}
-                  className="p-2 hover:bg-purple-100/70 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <X className="w-5 h-5 text-purple-600" />
+                  <X className="w-5 h-5 text-slate-600" />
                 </button>
               </div>
 
               {/* Modal Content */}
               <div className="p-6">
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-800 via-violet-700 to-indigo-800 bg-clip-text text-transparent mb-4 leading-tight">
+                <h2 className="text-3xl font-bold text-slate-800 mb-4 leading-tight">
                   {selectedBlog.title}
                 </h2>
                 
-                <div className="flex items-center space-x-6 text-sm text-slate-600 mb-6 pb-6 border-b border-purple-200/50">
+                <div className="flex items-center space-x-6 text-sm text-slate-600 mb-6 pb-6 border-b border-gray-200">
                   <div className="flex items-center">
-                    <User className="w-4 h-4 mr-2 text-purple-500" />
+                    <User className="w-4 h-4 mr-2" />
                     CA Nisha
                   </div>
                   <div className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-2 text-violet-500" />
+                    <Calendar className="w-4 h-4 mr-2" />
                     {selectedBlog.date}
                   </div>
                   <div className="flex items-center">
-                    <Clock className="w-4 h-4 mr-2 text-indigo-500" />
+                    <Clock className="w-4 h-4 mr-2" />
                     {selectedBlog.readTime}
                   </div>
                 </div>
@@ -202,12 +193,12 @@ const Blogs = () => {
                 </div>
 
                 {/* Call to Action */}
-                <div className="mt-8 p-6 bg-gradient-to-r from-purple-50/80 to-violet-50/80 rounded-lg border border-purple-200/50 backdrop-blur-sm">
-                  <h3 className="text-lg font-semibold text-purple-800 mb-2">Need Professional Assistance?</h3>
+                <div className="mt-8 p-6 bg-slate-50 rounded-lg border border-gray-200">
+                  <h3 className="text-lg font-semibold text-slate-800 mb-2">Need Professional Assistance?</h3>
                   <p className="text-slate-600 mb-4">
                     Get expert guidance on your specific requirements. Contact me for personalized consultation.
                   </p>
-                  <button className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-violet-700 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-violet-800 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-500/25">
+                  <button className="inline-flex items-center space-x-2 bg-slate-800 text-white px-6 py-3 rounded-lg font-medium hover:bg-slate-900 transition-colors duration-300">
                     <span>Schedule Consultation</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
@@ -218,27 +209,22 @@ const Blogs = () => {
         )}
 
         {/* Bottom CTA Section */}
-        <div className={`text-center mt-16 relative z-10 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`} style={{ animationDelay: '0.8s' }}>
-          <div className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-purple-200/50 relative overflow-hidden">
-            {/* Background gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-50/40 via-violet-50/30 to-fuchsia-50/20 opacity-50"></div>
-            
-            <div className="relative z-10">
-              <FileText className="w-12 h-12 text-purple-600 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-800 to-violet-700 bg-clip-text text-transparent mb-4">Want More Insights?</h3>
-              <p className="text-slate-600 mb-6 max-w-2xl mx-auto">
-                Subscribe to get the latest updates on tax regulations, business finance tips, and compliance requirements directly in your inbox.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 px-4 py-3 border border-purple-300/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/70 backdrop-blur-sm"
-                />
-                <button className="bg-gradient-to-r from-purple-600 to-violet-700 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-violet-800 transition-all duration-300 whitespace-nowrap transform hover:scale-105 shadow-lg hover:shadow-purple-500/25">
-                  Subscribe
-                </button>
-              </div>
+        <div className={`text-center mt-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`} style={{ animationDelay: '0.8s' }}>
+          <div className="bg-white p-8 rounded-xl border border-gray-200">
+            <FileText className="w-12 h-12 text-slate-700 mx-auto mb-4" />
+            <h3 className="text-2xl font-bold text-slate-800 mb-4">Want More Insights?</h3>
+            <p className="text-slate-600 mb-6 max-w-2xl mx-auto">
+              Subscribe to get the latest updates on tax regulations, business finance tips, and compliance requirements directly in your inbox.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+              />
+              <button className="bg-slate-800 text-white px-6 py-3 rounded-lg font-medium hover:bg-slate-900 transition-colors duration-300 whitespace-nowrap">
+                Subscribe
+              </button>
             </div>
           </div>
         </div>

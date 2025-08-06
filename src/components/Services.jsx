@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Shield, Receipt, Building, CheckCircle, ArrowRight, Star, Users, Clock, Award } from 'lucide-react';
 
-const backgroundImages = [
-  'https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', // Office workspace (neutral)
-  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', // Professional businesswoman
-  'https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', // Female financial analyst
-  'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', // Professional woman working
-];
-
 const services = [
   {
     id: 'itr',
@@ -22,9 +15,6 @@ const services = [
     ],
     price: 'Starting from ₹1,500',
     duration: '2-3 business days',
-    color: 'from-blue-500 to-indigo-600',
-    bgColor: 'bg-blue-500/10',
-    borderColor: 'border-blue-500/30',
     delay: '0s'
   },
   {
@@ -40,9 +30,6 @@ const services = [
     ],
     price: 'Starting from ₹15,000',
     duration: '1-2 weeks',
-    color: 'from-green-500 to-emerald-600',
-    bgColor: 'bg-green-500/10',
-    borderColor: 'border-green-500/30',
     delay: '0.2s'
   },
   {
@@ -58,9 +45,6 @@ const services = [
     ],
     price: 'Starting from ₹2,500/month',
     duration: 'Ongoing support',
-    color: 'from-purple-500 to-violet-600',
-    bgColor: 'bg-purple-500/10',
-    borderColor: 'border-purple-500/30',
     delay: '0.4s'
   },
   {
@@ -76,9 +60,6 @@ const services = [
     ],
     price: 'Starting from ₹8,000',
     duration: '7-10 business days',
-    color: 'from-orange-500 to-red-600',
-    bgColor: 'bg-orange-500/10',
-    borderColor: 'border-orange-500/30',
     delay: '0.6s'
   }
 ];
@@ -91,16 +72,8 @@ const whyChooseUs = [
 ];
 
 const Services = () => {
-  const [currentBg, setCurrentBg] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(services.length); // Start from second set
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentBg((prev) => (prev + 1) % backgroundImages.length);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, []);
+  const [currentSlide, setCurrentSlide] = useState(services.length);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -120,26 +93,23 @@ const Services = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => {
-        // Reset to start of second set when reaching end of second set
         if (prev >= services.length * 2 - 1) {
           return services.length;
         }
         return prev + 1;
       });
-    }, 3000);
+    }, 4000);
     
     return () => clearInterval(interval);
   }, []);
 
   // Handle seamless loop transition
   useEffect(() => {
-    // When we reach the end of the third set, instantly jump to start of second set
     if (currentSlide >= services.length * 3) {
       setTimeout(() => {
         setCurrentSlide(services.length);
       }, 50);
     }
-    // When we go before the first set, instantly jump to end of second set
     else if (currentSlide < 0) {
       setTimeout(() => {
         setCurrentSlide(services.length * 2 - 1);
@@ -148,7 +118,6 @@ const Services = () => {
   }, [currentSlide]);
 
   const handleGetStarted = () => {
-    // Scroll to contact section when Get Started is clicked
     const element = document.getElementById('contact');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -156,189 +125,228 @@ const Services = () => {
   };
 
   const goToSlide = (index) => {
-    // Jump to the corresponding position in the second set
     setCurrentSlide(index + services.length);
   };
 
-  // Calculate transform for infinite scroll with 2.2 cards visible
   const getTransform = () => {
-    const cardWidth = 100 / 2.2; // Show 2.2 cards
+    const cardWidth = 100 / 2.2;
     return `translateX(-${currentSlide * cardWidth}%)`;
   };
 
   return (
-    <section id="services" className="relative py-20 overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 z-0">
-        {backgroundImages.map((bg, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentBg ? 'opacity-100' : 'opacity-0'
-            }`}
-            style={{
-              backgroundImage: `url(${bg})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              filter: 'blur(3px)'
-            }}
-          />
-        ))}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/85 via-blue-900/80 to-slate-900/85"></div>
-      </div>
+    <section id="services" className="py-20 relative overflow-hidden">
+      {/* Enhanced Background with subtle patterns and colors */}
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/40 via-white to-teal-50/30"></div>
+      
+      {/* Decorative background elements */}
+      <div className="absolute top-20 right-10 w-80 h-80 bg-gradient-to-br from-emerald-100/30 to-teal-100/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }}></div>
+      <div className="absolute bottom-20 left-10 w-72 h-72 bg-gradient-to-br from-teal-100/25 to-cyan-100/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s', animationDuration: '5s' }}></div>
+      <div className="absolute top-1/3 left-1/4 w-2 h-2 bg-emerald-400/60 rounded-full animate-ping"></div>
+      <div className="absolute bottom-1/3 right-1/4 w-1.5 h-1.5 bg-teal-400/70 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+      
+      {/* Subtle pattern overlay */}
+      <div className="absolute inset-0 opacity-[0.02]" style={{
+        backgroundImage: `radial-gradient(circle at 1px 1px, rgb(16,185,129) 1px, transparent 0)`,
+        backgroundSize: '50px 50px'
+      }}></div>
 
-      {/* Floating Elements */}
-      <div className="absolute inset-0 z-10">
-        <div className="absolute top-20 left-20 w-32 h-32 bg-blue-500/10 rounded-full animate-float"></div>
-        <div className="absolute top-40 right-32 w-24 h-24 bg-purple-500/10 rounded-full animate-float-delayed"></div>
-        <div className="absolute bottom-32 left-1/4 w-20 h-20 bg-green-500/10 rounded-full animate-float"></div>
-        <div className="absolute bottom-20 right-20 w-28 h-28 bg-orange-500/10 rounded-full animate-float-delayed"></div>
-      </div>
-
-      <div className="container mx-auto px-4 relative z-20">
-        {/* Header Section */}
+      <div className="container mx-auto px-6 relative z-10">
+        {/* Enhanced Header Section */}
         <div className={`text-center mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
-          <h2 className="text-5xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Professional Services
+          <div className="relative inline-block">
+            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-200/50 to-teal-200/50 rounded-full blur opacity-75"></div>
+            <div className="relative inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm text-slate-700 px-6 py-3 rounded-full text-sm font-medium border border-emerald-100/50 shadow-sm">
+              <Award className="w-4 h-4 text-emerald-600" />
+              <span>Professional Services</span>
+            </div>
+          </div>
+          
+          <h2 className="text-5xl font-bold mb-6 mt-8">
+            <span className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 bg-clip-text text-transparent">Professional</span>{' '}
+            <span className="bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 bg-clip-text text-transparent">Services</span>
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Comprehensive financial and compliance services tailored to meet your business needs with expertise and precision.
+          <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
+            Comprehensive financial and compliance services tailored to meet your business needs with 
+            <span className="text-emerald-700 font-semibold bg-emerald-50/50 px-2 py-1 rounded mx-1">expertise</span> 
+            and 
+            <span className="text-teal-700 font-semibold bg-teal-50/50 px-2 py-1 rounded mx-1">precision</span>.
           </p>
         </div>
 
-        {/* Services Carousel - Infinite */}
+        {/* Services Carousel */}
         <div className="relative mb-16">
-          {/* Carousel Container */}
-          <div className="overflow-hidden rounded-2xl">
+          <div className="overflow-hidden">
             <div 
-              className="flex transition-transform duration-1000 ease-linear"
+              className="flex transition-transform duration-1000 ease-in-out"
               style={{ 
                 transform: getTransform(),
                 transitionDuration: currentSlide >= services.length * 3 || currentSlide < 0 ? '0ms' : '1000ms'
               }}
             >
-              {/* Render services multiple times for infinite effect */}
               {[...services, ...services, ...services].map((service, index) => (
-                <div
-                  key={`${service.id}-${index}`}
-                  className="flex-shrink-0 px-3"
-                  style={{ width: `${100 / 2.2}%` }}
-                >
-                  <div className={`group/card bg-white/10 backdrop-blur-lg p-5 rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl ${
-                    isVisible ? 'animate-slide-up' : 'opacity-0'
-                  } h-80`}>
-                    {/* Service Header */}
-                    <div className="flex items-center space-x-3 mb-4">
-                      <div className={`p-3 rounded-xl ${service.bgColor} ${service.borderColor} border-2 group-hover/card:scale-110 transition-transform duration-300`}>
-                        <service.icon className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-white mb-1">{service.title}</h3>
-                        <p className="text-xs text-gray-300 line-clamp-2">{service.description}</p>
-                      </div>
-                    </div>
+                  <div
+                    key={`${service.id}-${index}`}
+                    className="flex-shrink-0 px-3"
+                    style={{ width: `${100 / 2.2}%` }}
+                  >
+                    <div className={`group relative overflow-hidden bg-white/80 backdrop-blur-sm p-8 rounded-2xl border border-emerald-100/50 hover:border-emerald-200/70 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 ${
+                      isVisible ? 'animate-slide-up' : 'opacity-0'
+                    } h-96`}>
+                      {/* Gradient overlay on hover */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/0 to-teal-50/0 group-hover:from-emerald-50/30 group-hover:to-teal-50/20 transition-all duration-500 rounded-2xl"></div>
 
-                    {/* Features List - Compact */}
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-white mb-2 flex items-center">
-                        <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
-                        Key Features
-                      </h4>
-                      <ul className="space-y-1">
-                        {service.features.slice(0, 3).map((feature, idx) => (
-                          <li key={idx} className="flex items-center text-xs text-gray-300">
-                            <Star className="w-3 h-3 text-yellow-400 mr-2 flex-shrink-0" />
-                            <span className="truncate">{feature}</span>
-                          </li>
-                        ))}
-                        {service.features.length > 3 && (
-                          <li className="text-xs text-gray-400 ml-5">+{service.features.length - 3} more features</li>
-                        )}
-                      </ul>
-                    </div>
-
-                    {/* Service Details - Compact */}
-                    <div className="grid grid-cols-2 gap-2 mb-4">
-                      <div>
-                        <p className="text-xs text-gray-400 mb-1">Starting Price</p>
-                        <p className="text-sm font-semibold text-green-400">{service.price}</p>
+                      {/* Service Header */}
+                      <div className="relative flex items-center space-x-4 mb-6">
+                        <div className="relative">
+                          <div className="absolute -inset-2 bg-gradient-to-r from-emerald-200/50 to-teal-200/50 rounded-xl blur opacity-0 group-hover:opacity-75 transition-opacity duration-500"></div>
+                          <div className="relative p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100/50 group-hover:from-emerald-100 group-hover:to-teal-100 transition-all duration-300">
+                            <service.icon className="w-6 h-6 text-emerald-700 group-hover:text-emerald-800 transition-colors duration-300" />
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-slate-900 transition-colors duration-300">{service.title}</h3>
+                          <p className="text-sm text-slate-600 line-clamp-2 group-hover:text-slate-700 transition-colors duration-300">{service.description}</p>
+                        </div>
+                      </div>                      {/* Enhanced Features List */}
+                      <div className="relative mb-6">
+                        <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center group-hover:text-slate-900 transition-colors duration-300">
+                          <CheckCircle className="w-4 h-4 text-emerald-600 mr-2 group-hover:text-emerald-700 transition-colors duration-300" />
+                          Key Features
+                        </h4>
+                        <ul className="space-y-3">
+                          {service.features.slice(0, 3).map((feature, idx) => (
+                            <li key={idx} className="flex items-center text-sm text-slate-600 group-hover:text-slate-700 transition-colors duration-300">
+                              <div className="w-2 h-2 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full mr-3 flex-shrink-0 group-hover:from-emerald-500 group-hover:to-teal-500 transition-all duration-300"></div>
+                              <span className="truncate">{feature}</span>
+                            </li>
+                          ))}
+                          {service.features.length > 3 && (
+                            <li className="text-sm text-emerald-600 ml-5 font-medium group-hover:text-emerald-700 transition-colors duration-300">+{service.features.length - 3} more features</li>
+                          )}
+                        </ul>
                       </div>
-                      <div>
-                        <p className="text-xs text-gray-400 mb-1">Turnaround</p>
-                        <p className="text-sm font-semibold text-blue-400">{service.duration}</p>
-                      </div>
-                    </div>
 
-                    {/* CTA Button - Compact */}
-                    <button
-                      onClick={handleGetStarted}
-                      className={`w-full py-2 bg-gradient-to-r ${service.color} text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 text-sm`}
-                    >
-                      <span>Get Started</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
+                      {/* Enhanced Service Details */}
+                      <div className="relative grid grid-cols-2 gap-4 mb-6">
+                        <div className="p-3 bg-gradient-to-br from-emerald-50/50 to-teal-50/30 rounded-lg border border-emerald-100/30 group-hover:from-emerald-50 group-hover:to-teal-50 transition-all duration-300">
+                          <p className="text-xs text-emerald-600 mb-1 font-medium">Starting Price</p>
+                          <p className="text-sm font-semibold text-slate-800 group-hover:text-slate-900 transition-colors duration-300">{service.price}</p>
+                        </div>
+                        <div className="p-3 bg-gradient-to-br from-teal-50/50 to-cyan-50/30 rounded-lg border border-teal-100/30 group-hover:from-teal-50 group-hover:to-cyan-50 transition-all duration-300">
+                          <p className="text-xs text-teal-600 mb-1 font-medium">Turnaround</p>
+                          <p className="text-sm font-semibold text-slate-800 group-hover:text-slate-900 transition-colors duration-300">{service.duration}</p>
+                        </div>
+                      </div>
+
+                      {/* Enhanced CTA Button */}
+                      <button
+                        onClick={handleGetStarted}
+                        className="relative w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all duration-300 flex items-center justify-center space-x-2 transform hover:scale-105 shadow-lg hover:shadow-xl group/btn"
+                      >
+                        <span>Get Started</span>
+                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
+                      </button>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Pagination Dots */}
+          {/* Enhanced Pagination Dots */}
           <div className="flex justify-center space-x-3 mt-8">
             {services.map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 hover:scale-125 ${
+                className={`relative w-4 h-4 rounded-full transition-all duration-300 transform hover:scale-125 ${
                   (currentSlide % services.length) === index 
-                    ? 'bg-white shadow-lg scale-110' 
-                    : 'bg-white/40 hover:bg-white/60'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 scale-110 shadow-lg' 
+                    : 'bg-emerald-200 hover:bg-emerald-300'
                 }`}
                 title={services[index].title}
-              />
+              >
+                {(currentSlide % services.length) === index && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full animate-ping opacity-75"></div>
+                )}
+              </button>
             ))}
           </div>
 
-          {/* Service Names Below Dots */}
-          <div className="flex justify-center mt-3">
-            <div className="text-sm text-gray-400 text-center">
-              <span className="font-medium text-white">
+          {/* Enhanced Service Names Below Dots */}
+          <div className="flex justify-center mt-4">
+            <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-emerald-100/50 shadow-sm">
+              <span className="text-sm text-slate-600">Currently Viewing:</span>
+              <span className="font-semibold text-emerald-700 ml-2 bg-emerald-50/50 px-3 py-1 rounded-lg">
                 {services[(currentSlide % services.length)].title}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Why Choose Us Section */}
+        {/* Enhanced Why Choose Us Section */}
         <div className={`${isVisible ? 'animate-slide-up' : 'opacity-0'}`} style={{ animationDelay: '0.8s' }}>
-          <h3 className="text-3xl font-bold text-white text-center mb-12">Why Choose Our Services?</h3>
+          <h3 className="text-4xl font-bold text-center mb-4">
+            <span className="bg-gradient-to-r from-slate-800 to-slate-700 bg-clip-text text-transparent">Why Choose</span>{' '}
+            <span className="bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">Our Services?</span>
+          </h3>
+          <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
+            Experience the difference with our professional approach and commitment to excellence.
+          </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {whyChooseUs.map((item, index) => (
-              <div
-                key={index}
-                className="text-center p-6 bg-white/20 backdrop-blur-lg rounded-2xl border border-white/30 hover:bg-white/30 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-              >
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4 shadow-lg">
-                  <item.icon className="w-8 h-8 text-white" />
+            {whyChooseUs.map((item, index) => {
+              const colors = ['emerald', 'teal', 'cyan', 'blue'];
+              const color = colors[index % colors.length];
+              return (
+                <div
+                  key={index}
+                  className="group text-center p-8 bg-white/70 backdrop-blur-sm rounded-2xl border border-emerald-100/50 hover:border-emerald-200/70 hover:shadow-2xl transition-all duration-500 transform hover:scale-105"
+                >
+                  {/* Icon with enhanced styling */}
+                  <div className="relative mb-6">
+                    <div className={`absolute -inset-2 bg-gradient-to-r from-${color}-200/50 to-${color}-300/50 rounded-xl blur opacity-0 group-hover:opacity-75 transition-opacity duration-500`}></div>
+                    <div className={`relative inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-${color}-50 to-${color}-100 border border-${color}-100/50 rounded-2xl group-hover:from-${color}-100 group-hover:to-${color}-150 transition-all duration-300`}>
+                      <item.icon className={`w-8 h-8 text-${color}-700 group-hover:text-${color}-800 transition-colors duration-300`} />
+                    </div>
+                  </div>
+                  <h4 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-slate-900 transition-colors duration-300">{item.title}</h4>
+                  <p className="text-slate-600 text-sm leading-relaxed group-hover:text-slate-700 transition-colors duration-300">{item.description}</p>
                 </div>
-                <h4 className="text-xl font-semibold text-white mb-2">{item.title}</h4>
-                <p className="text-gray-200 text-sm">{item.description}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
-        {/* Bottom CTA */}
-        <div className={`text-center mt-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`} style={{ animationDelay: '1s' }}>
-          <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-lg p-8 rounded-2xl border border-white/20">
-            <h3 className="text-2xl font-bold text-white mb-4">Ready to Get Started?</h3>
-            <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-              Let's discuss your requirements and provide you with the best financial solutions for your business growth.
-            </p>
-            <button className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-500 to-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:from-green-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-300">
-              <span>Schedule a Consultation</span>
-              <ArrowRight className="w-5 h-5" />
-            </button>
+        {/* Enhanced Bottom CTA */}
+        <div className={`text-center mt-20 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`} style={{ animationDelay: '1s' }}>
+          <div className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 text-white p-12 rounded-3xl shadow-2xl">
+            {/* Decorative background elements */}
+            <div className="absolute top-0 left-0 w-40 h-40 bg-white/10 rounded-full -translate-x-20 -translate-y-20"></div>
+            <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full translate-x-16 translate-y-16"></div>
+            <div className="absolute top-1/2 left-1/4 w-2 h-2 bg-white/30 rounded-full animate-pulse"></div>
+            <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-white/40 rounded-full animate-ping"></div>
+            
+            <div className="relative z-10">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-white/15 rounded-full mb-6 backdrop-blur-sm border border-white/20">
+                <ArrowRight className="w-10 h-10 text-white" />
+              </div>
+              
+              <h3 className="text-4xl font-bold mb-4">Ready to Get Started?</h3>
+              <p className="text-emerald-100 mb-8 max-w-3xl mx-auto text-lg leading-relaxed">
+                Let's discuss your requirements and provide you with the best financial solutions for your business growth. 
+                <span className="text-white font-semibold"> Experience professional excellence</span> with our comprehensive CA services.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                <button className="group inline-flex items-center justify-center space-x-3 bg-white text-emerald-700 px-10 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                  <span>Schedule a Consultation</span>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                </button>
+                <button className="group inline-flex items-center justify-center space-x-3 bg-transparent text-white px-10 py-4 rounded-xl font-semibold border-2 border-white/30 hover:border-white hover:bg-white/10 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm">
+                  <span>View All Services</span>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
