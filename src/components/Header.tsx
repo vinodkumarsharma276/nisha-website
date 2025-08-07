@@ -1,74 +1,65 @@
 import React, { useState } from 'react';
 import { Linkedin, Twitter, Menu, X } from 'lucide-react';
 
+const nav = [
+	{ id: 'home', label: 'Home' },
+	{ id: 'services', label: 'Services' },
+	{ id: 'blogs', label: 'Blogs' },
+	{ id: 'projects', label: 'Projects' },
+	{ id: 'experience', label: 'Experience' },
+	{ id: 'contact', label: 'Contact' }
+];
+
 const Header: React.FC = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	const scrollToSection = (id: string) => {
+		const el = document.getElementById(id);
+		if (el) el.scrollIntoView({ behavior: 'smooth' });
+		setIsMobileMenuOpen(false);
+	};
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-    setIsMobileMenuOpen(false);
-  };
-
-  return (
-    <header className="bg-slate-900/90 backdrop-blur-lg text-white p-4 fixed w-full z-50 border-b border-purple-500/20">
-      <div className="container mx-auto flex justify-between items-center">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-lg">N</span>
-          </div>
-          <h1 className="text-xl font-bold">Nisha, CA</h1>
-        </div>
-        
-        {/* <nav className="hidden md:flex space-x-8">
-          <a href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('home'); }} className="hover:text-purple-300 transition-colors">Home</a>
-          <a href="#blogs" onClick={(e) => { e.preventDefault(); scrollToSection('blogs'); }} className="hover:text-purple-300 transition-colors">Blogs</a>
-          <a href="#projects" onClick={(e) => { e.preventDefault(); scrollToSection('projects'); }} className="hover:text-purple-300 transition-colors">Projects</a>
-          <a href="#experience" onClick={(e) => { e.preventDefault(); scrollToSection('experience'); }} className="hover:text-purple-300 transition-colors">Experience</a>
-          <a href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }} className="hover:text-purple-300 transition-colors">Contact</a>
-        </nav> */}
-
-        <div className="flex items-center space-x-4">
-          <div className="hidden md:flex items-center space-x-4">
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-purple-300 transition-colors">
-              <Linkedin size={20} />
-            </a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-purple-300 transition-colors">
-              <Twitter size={20} />
-            </a>
-          </div>
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-      </div>
-
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-slate-900/95 backdrop-blur-lg pb-4">
-          <nav className="flex flex-col items-center space-y-4 pt-4">
-            {/* <a href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('home'); }} className="hover:text-purple-300 transition-colors py-2">Home</a>
-            <a href="#blogs" onClick={(e) => { e.preventDefault(); scrollToSection('blogs'); }} className="hover:text-purple-300 transition-colors py-2">Blogs</a> */}
-            <a href="#projects" onClick={(e) => { e.preventDefault(); scrollToSection('projects'); }} className="hover:text-purple-300 transition-colors py-2">Projects</a>
-            <a href="#experience" onClick={(e) => { e.preventDefault(); scrollToSection('experience'); }} className="hover:text-purple-300 transition-colors py-2">Experience</a>
-            <a href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }} className="hover:text-purple-300 transition-colors py-2">Contact</a>
-            <div className="flex items-center space-x-6 pt-4 border-t border-slate-700 w-full justify-center">
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-purple-300">
-                <Linkedin size={22} />
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-purple-300">
-                <Twitter size={22} />
-              </a>
-            </div>
-          </nav>
-        </div>
-      )}
-    </header>
-  );
+	return (
+		<header className="fixed inset-x-0 top-0 z-50 backdrop-blur-xl bg-white/75 border-b border-slate-200/70">
+			<div className="container mx-auto flex items-center justify-between px-4 py-3">
+				<button onClick={() => scrollToSection('home')} className="flex items-center gap-3 group">
+					<div className="w-10 h-10 rounded-md bg-accent-soft flex items-center justify-center text-accent font-bold tracking-tight shadow-sm">N</div>
+					<span className="font-semibold text-slate-800 group-hover:text-accent transition-colors">Nisha, CA</span>
+				</button>
+				<nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+					{nav.map(item => (
+						<button
+							key={item.id}
+							onClick={() => scrollToSection(item.id)}
+							className="relative text-slate-600 hover:text-accent transition-colors py-2 group"
+						>
+							{item.label}
+							<span className="absolute left-0 -bottom-0.5 h-[2px] w-0 bg-accent transition-all group-hover:w-full" />
+						</button>
+					))}
+					<div className="flex items-center gap-4 pl-4 ml-4 border-l border-slate-200">
+						<a href="https://linkedin.com" aria-label="LinkedIn" className="text-slate-500 hover:text-accent transition-colors"><Linkedin size={18} /></a>
+						<a href="https://twitter.com" aria-label="Twitter" className="text-slate-500 hover:text-accent transition-colors"><Twitter size={18} /></a>
+					</div>
+				</nav>
+				<button onClick={() => setIsMobileMenuOpen(p => !p)} className="md:hidden p-2 rounded-md text-slate-600 hover:bg-accent-soft">
+					{isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+				</button>
+			</div>
+			{isMobileMenuOpen && (
+				<div className="md:hidden border-t border-slate-200 bg-white/80 backdrop-blur-xl">
+					<nav className="flex flex-col px-4 py-4 gap-2">
+						{nav.map(item => (
+							<button key={item.id} onClick={() => scrollToSection(item.id)} className="text-left px-2 py-2 rounded-md text-slate-700 hover:bg-accent-soft hover:text-accent font-medium">{item.label}</button>
+						))}
+						<div className="flex items-center gap-5 pt-3 mt-2 border-t border-slate-200">
+							<a href="https://linkedin.com" className="text-slate-500 hover:text-accent"><Linkedin size={20} /></a>
+							<a href="https://twitter.com" className="text-slate-500 hover:text-accent"><Twitter size={20} /></a>
+						</div>
+					</nav>
+				</div>
+			)}
+		</header>
+	);
 };
 
 export default Header;

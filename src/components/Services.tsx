@@ -1,358 +1,51 @@
 import { useState, useEffect } from 'react';
-import { FileText, Shield, Receipt, Building, CheckCircle, ArrowRight, Star, Users, Clock, Award, ChevronLeft, ChevronRight } from 'lucide-react';
-
-const backgroundImages = [
-  'https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', // Office workspace (neutral)
-  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', // Professional businesswoman
-  'https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', // Female financial analyst
-  'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', // Professional woman working
-];
+import { FileText, Shield, Receipt, Building, CheckCircle, ArrowRight } from 'lucide-react';
 
 const services = [
-  {
-    id: 'itr',
-    title: 'Income Tax Return (ITR)',
-    description: 'Comprehensive ITR filing services for individuals and businesses with expert guidance and maximum refund optimization.',
-    icon: FileText,
-    features: [
-      'Individual & Business ITR Filing',
-      'Tax Planning & Optimization',
-      'Refund Processing Support',
-      'Assessment & Appeals'
-    ],
-    price: 'Starting from ₹1,500',
-    duration: '2-3 business days',
-    color: 'from-blue-500 to-indigo-600',
-    bgColor: 'bg-blue-500/10',
-    borderColor: 'border-blue-500/30',
-    delay: '0s'
-  },
-  {
-    id: 'tax-audit',
-    title: 'Tax Audit',
-    description: 'Professional tax audit services ensuring compliance with regulatory requirements and identifying optimization opportunities.',
-    icon: Shield,
-    features: [
-      'Statutory Tax Audits',
-      'Internal Tax Reviews',
-      'Compliance Assessment',
-      'Risk Management'
-    ],
-    price: 'Starting from ₹15,000',
-    duration: '1-2 weeks',
-    color: 'from-green-500 to-emerald-600',
-    bgColor: 'bg-green-500/10',
-    borderColor: 'border-green-500/30',
-    delay: '0.2s'
-  },
-  {
-    id: 'gst-filing',
-    title: 'GST Filing',
-    description: 'End-to-end GST compliance services including registration, return filing, and ongoing support for seamless operations.',
-    icon: Receipt,
-    features: [
-      'GST Registration & Setup',
-      'Monthly/Quarterly Returns',
-      'Input Tax Credit Optimization',
-      'GST Compliance Management'
-    ],
-    price: 'Starting from ₹2,500/month',
-    duration: 'Ongoing support',
-    color: 'from-purple-500 to-violet-600',
-    bgColor: 'bg-purple-500/10',
-    borderColor: 'border-purple-500/30',
-    delay: '0.4s'
-  },
-  {
-    id: 'company-registration',
-    title: 'Company Registration',
-    description: 'Complete company incorporation services with legal compliance, documentation, and post-registration support.',
-    icon: Building,
-    features: [
-      'Private Limited Company Setup',
-      'LLP & Partnership Registration',
-      'Documentation & Compliance',
-      'Post-Registration Support'
-    ],
-    price: 'Starting from ₹8,000',
-    duration: '7-10 business days',
-    color: 'from-orange-500 to-red-600',
-    bgColor: 'bg-orange-500/10',
-    borderColor: 'border-orange-500/30',
-    delay: '0.6s'
-  }
-];
-
-const whyChooseUs = [
-  { icon: Award, title: 'Expert CA Professional', description: '5+ years of experience' },
-  { icon: Users, title: '200+ Satisfied Clients', description: 'Trusted by businesses' },
-  { icon: Clock, title: 'Quick Turnaround', description: 'Fast & reliable service' },
-  { icon: CheckCircle, title: '100% Compliance', description: 'Error-free filing' }
+  { id:'itr', title:'Income Tax Return (ITR)', desc:'Comprehensive ITR filing for individuals & businesses with optimization guidance.', icon:FileText, features:['Individual & Business Filing','Tax Planning','Refund Support','Assessment & Appeals'], price:'From ₹1,500', duration:'2-3 days' },
+  { id:'tax-audit', title:'Tax Audit', desc:'Regulatory compliant tax audits identifying optimization opportunities.', icon:Shield, features:['Statutory Audits','Internal Reviews','Compliance Assessment','Risk Management'], price:'From ₹15,000', duration:'1-2 weeks' },
+  { id:'gst', title:'GST Filing', desc:'End‑to‑end GST compliance & return filing with ITC optimization.', icon:Receipt, features:['Registration','Monthly/Quarterly Returns','ITC Optimization','Compliance Mgmt'], price:'From ₹2,500/mo', duration:'Ongoing' },
+  { id:'company-reg', title:'Company Registration', desc:'Complete incorporation with legal compliance & documentation.', icon:Building, features:['Pvt Ltd / LLP','Documentation','Compliance Setup','Post‑Registration Support'], price:'From ₹8,000', duration:'7-10 days' }
 ];
 
 const Services = () => {
-  const [currentBg, setCurrentBg] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentBg((prev) => (prev + 1) % backgroundImages.length);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold: 0.1 }
-    );
-
-    const element = document.getElementById('services');
-    if (element) observer.observe(element);
-
-    return () => observer.disconnect();
-  }, []);
-
-  // Auto-play carousel
-  useEffect(() => {
-    if (!isAutoPlaying) return;
-    
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % services.length);
-    }, 4000);
-    
-    return () => clearInterval(interval);
-  }, [isAutoPlaying]);
-
-  const handleGetStarted = () => {
-    // Scroll to contact section when Get Started is clicked
-    const element = document.getElementById('contact');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % services.length);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000); // Resume auto-play after 10 seconds
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + services.length) % services.length);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000); // Resume auto-play after 10 seconds
-  };
-
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000); // Resume auto-play after 10 seconds
-  };
-
-  // Calculate transform for showing 2.2 cards
-  const getTransform = () => {
-    const cardWidth = 100 / 2.2; // Show 2.2 cards
-    return `translateX(-${currentSlide * cardWidth}%)`;
-  };
+  const [mounted, setMounted] = useState(false);
+  useEffect(()=>{ setMounted(true); }, []);
 
   return (
-    <section id="services" className="relative py-20 overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 z-0">
-        {backgroundImages.map((bg, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentBg ? 'opacity-100' : 'opacity-0'
-            }`}
-            style={{
-              backgroundImage: `url(${bg})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              filter: 'blur(3px)'
-            }}
-          />
-        ))}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/85 via-blue-900/80 to-slate-900/85"></div>
-      </div>
-
-      {/* Floating Elements */}
-      <div className="absolute inset-0 z-10">
-        <div className="absolute top-20 left-20 w-32 h-32 bg-blue-500/10 rounded-full animate-float"></div>
-        <div className="absolute top-40 right-32 w-24 h-24 bg-purple-500/10 rounded-full animate-float-delayed"></div>
-        <div className="absolute bottom-32 left-1/4 w-20 h-20 bg-green-500/10 rounded-full animate-float"></div>
-        <div className="absolute bottom-20 right-20 w-28 h-28 bg-orange-500/10 rounded-full animate-float-delayed"></div>
-      </div>
-
-      <div className="container mx-auto px-4 relative z-20">
-        {/* Header Section */}
-        <div className={`text-center mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
-          <h2 className="text-5xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Professional Services
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Comprehensive financial and compliance services tailored to meet your business needs with expertise and precision.
-          </p>
+    <section id="services" className="py-24 relative bg-[linear-gradient(to_bottom,rgba(var(--ca-bg),1),rgba(var(--ca-bg-alt),.6))]">
+      <div className="absolute inset-0 ca-grid-bg opacity-[0.04]" />
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <h2 className="section-heading text-slate-900 mb-4">Professional Services</h2>
+          <p className="text-slate-600 leading-relaxed">Focused, compliant and scalable financial & compliance solutions for growing organizations.</p>
         </div>
-
-        {/* Services Carousel */}
-        <div className="relative mb-16 group">
-          {/* Navigation Arrows - Only visible on hover */}
-          <button
-            onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-white/20 backdrop-blur-lg p-3 rounded-full border border-white/30 hover:bg-white/30 transition-all duration-300 transform hover:scale-110 carousel-arrow-left opacity-0 group-hover:opacity-100"
-            onMouseEnter={() => setIsAutoPlaying(false)}
-            onMouseLeave={() => setIsAutoPlaying(true)}
-          >
-            <ChevronLeft className="w-6 h-6 text-white hover:text-blue-300 transition-colors duration-300" />
-          </button>
-          
-          <button
-            onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-white/20 backdrop-blur-lg p-3 rounded-full border border-white/30 hover:bg-white/30 transition-all duration-300 transform hover:scale-110 carousel-arrow-right opacity-0 group-hover:opacity-100"
-            onMouseEnter={() => setIsAutoPlaying(false)}
-            onMouseLeave={() => setIsAutoPlaying(true)}
-          >
-            <ChevronRight className="w-6 h-6 text-white hover:text-blue-300 transition-colors duration-300" />
-          </button>
-
-          {/* Carousel Container */}
-          <div className="overflow-hidden rounded-2xl">
-            <div 
-              className="flex transition-transform duration-500 ease-in-out"
-              style={{ transform: getTransform() }}
-            >
-              {services.map((service) => (
-                <div
-                  key={service.id}
-                  className="flex-shrink-0 px-3"
-                  style={{ width: `${100 / 2.2}%` }}
-                  onMouseEnter={() => setIsAutoPlaying(false)}
-                  onMouseLeave={() => setIsAutoPlaying(true)}
-                >
-                  <div className={`group/card bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl ${
-                    isVisible ? 'animate-slide-up' : 'opacity-0'
-                  } h-96`}>
-                    {/* Service Header */}
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className={`p-3 rounded-xl ${service.bgColor} ${service.borderColor} border-2 group-hover/card:scale-110 transition-transform duration-300`}>
-                        <service.icon className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-white mb-1">{service.title}</h3>
-                        <p className="text-xs text-gray-300 line-clamp-2">{service.description}</p>
-                      </div>
-                    </div>
-
-                    {/* Features List - Compact */}
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-white mb-2 flex items-center">
-                        <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
-                        Key Features
-                      </h4>
-                      <ul className="space-y-1">
-                        {service.features.slice(0, 3).map((feature, idx) => (
-                          <li key={idx} className="flex items-center text-xs text-gray-300">
-                            <Star className="w-3 h-3 text-yellow-400 mr-2 flex-shrink-0" />
-                            <span className="truncate">{feature}</span>
-                          </li>
-                        ))}
-                        {service.features.length > 3 && (
-                          <li className="text-xs text-gray-400 ml-5">+{service.features.length - 3} more features</li>
-                        )}
-                      </ul>
-                    </div>
-
-                    {/* Service Details - Compact */}
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-                      <div>
-                        <p className="text-xs text-gray-400 mb-1">Starting Price</p>
-                        <p className="text-sm font-semibold text-green-400">{service.price}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-400 mb-1">Turnaround</p>
-                        <p className="text-sm font-semibold text-blue-400">{service.duration}</p>
-                      </div>
-                    </div>
-
-                    {/* CTA Button - Compact */}
-                    <button
-                      onClick={handleGetStarted}
-                      className={`w-full py-2 bg-gradient-to-r ${service.color} text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 text-sm`}
-                    >
-                      <span>Get Started</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Pagination Dots */}
-          <div className="flex justify-center space-x-2 mt-6">
-            {services.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentSlide 
-                    ? 'bg-white shadow-lg' 
-                    : 'bg-white/40 hover:bg-white/60'
-                }`}
-                onMouseEnter={() => setIsAutoPlaying(false)}
-                onMouseLeave={() => setIsAutoPlaying(true)}
-              />
-            ))}
-          </div>
-
-          {/* Auto-play Indicator */}
-          <div className="flex justify-center mt-4">
-            <div className={`text-xs text-gray-400 flex items-center space-x-2 ${isAutoPlaying ? 'opacity-100' : 'opacity-50'}`}>
-              <div className={`w-2 h-2 rounded-full ${isAutoPlaying ? 'bg-green-400 animate-pulse-glow' : 'bg-gray-400'}`}></div>
-              <span>{isAutoPlaying ? 'Auto-playing' : 'Paused - Hover to control'}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Why Choose Us Section */}
-        <div className={`${isVisible ? 'animate-slide-up' : 'opacity-0'}`} style={{ animationDelay: '0.8s' }}>
-          <h3 className="text-3xl font-bold text-white text-center mb-12">Why Choose Our Services?</h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {whyChooseUs.map((item, index) => (
-              <div
-                key={index}
-                className="text-center p-6 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:scale-105"
-              >
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4">
-                  <item.icon className="w-8 h-8 text-white" />
-                </div>
-                <h4 className="text-xl font-semibold text-white mb-2">{item.title}</h4>
-                <p className="text-gray-300 text-sm">{item.description}</p>
+        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6 mb-12">
+          {services.map((s)=> (
+            <div key={s.id} className="card p-6 flex flex-col rounded-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-md bg-accent-soft flex items-center justify-center text-accent"><s.icon className="w-5 h-5" /></div>
+                <h3 className="font-semibold text-slate-800 text-sm tracking-tight">{s.title}</h3>
               </div>
-            ))}
-          </div>
+              <p className="text-sm text-slate-600 mb-4 flex-1 leading-relaxed">{s.desc}</p>
+              <ul className="space-y-1 text-xs text-slate-500 mb-4">
+                {s.features.slice(0,3).map(f=> <li key={f} className="flex items-center gap-2"><CheckCircle className="w-3 h-3 text-accent" />{f}</li>)}
+                {s.features.length>3 && <li className="ml-5 text-[11px] text-slate-400">+{s.features.length-3} more</li>}
+              </ul>
+              <div className="flex justify-between items-center text-[11px] uppercase tracking-wide text-slate-500 mb-4">
+                <span>{s.price}</span><span>{s.duration}</span>
+              </div>
+              <button className="btn-primary w-full text-sm justify-center"><span>Get Started</span><ArrowRight className="w-4 h-4 ml-1" /></button>
+            </div>
+          ))}
         </div>
-
-        {/* Bottom CTA */}
-        <div className={`text-center mt-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`} style={{ animationDelay: '1s' }}>
-          <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-lg p-8 rounded-2xl border border-white/20">
-            <h3 className="text-2xl font-bold text-white mb-4">Ready to Get Started?</h3>
-            <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-              Let's discuss your requirements and provide you with the best financial solutions for your business growth.
-            </p>
-            <button className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-500 to-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:from-green-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-300">
-              <span>Schedule a Consultation</span>
-              <ArrowRight className="w-5 h-5" />
-            </button>
-          </div>
+        <div className="card p-10 rounded-2xl text-center max-w-4xl mx-auto">
+          <h3 className="text-xl font-semibold text-slate-900 mb-3">Need a tailored engagement?</h3>
+          <p className="text-slate-600 mb-6 text-sm leading-relaxed">I can assemble a bespoke compliance and finance support stack aligned to your operational maturity.</p>
+          <a href="#contact" className="btn-ghost text-accent border-accent hover:bg-accent-soft">Discuss Requirements</a>
         </div>
       </div>
+      {mounted && <div className="absolute bottom-0 left-0 right-0 h-24 bg-[radial-gradient(circle_at_50%_120%,rgba(var(--ca-accent-400),.25),transparent_70%)]" />}
     </section>
   );
 };
