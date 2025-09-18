@@ -6,8 +6,9 @@
   "homepage": "https://vinodkumarsharma276.github.io/nisha-website",
   "scripts": {
     "dev": "vite",
-    "build": "AZURE_STATIC_WEB_APPS=1 tsc -b && vite build",
-    "build:gh": "tsc -b && vite build",
+    "build": "BUILD_TARGET=azure tsc -b && vite build",
+    "build:azure": "BUILD_TARGET=azure tsc -b && vite build",
+    "build:gh": "BUILD_TARGET=gh tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build:gh",
