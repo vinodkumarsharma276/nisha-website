@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
-import { Linkedin, Twitter, Menu, X } from 'lucide-react';
+import { useState } from 'react';
+import { Linkedin, Twitter, Menu, X, Youtube } from 'lucide-react';
 
-const Header: React.FC = () => {
+const navLinks = [
+  { label: 'Home', id: 'home' },
+  { label: 'Services', id: 'services' },
+  { label: 'Blog', id: 'blogs' },
+  { label: 'Experience', id: 'experience' },
+  { label: 'Contact', id: 'contact' },
+];
+
+const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const scrollToSection = (id: string) => {
@@ -13,58 +21,82 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-slate-900/90 backdrop-blur-lg text-white p-4 fixed w-full z-50 border-b border-purple-500/20">
-      <div className="container mx-auto flex justify-between items-center">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-lg">N</span>
+    <header className="bg-white border-b border-gray-200 fixed w-full z-50">
+      <div className="container mx-auto px-4 sm:px-6 flex justify-between items-center h-16">
+        {/* Logo */}
+        <button onClick={() => scrollToSection('home')} className="flex items-center space-x-2">
+          <div className="w-9 h-9 bg-[#1e3a5f] rounded flex items-center justify-center">
+            <span className="text-white font-bold text-sm">N</span>
           </div>
-          <h1 className="text-xl font-bold">Nisha, CA</h1>
-        </div>
-        
-        {/* <nav className="hidden md:flex space-x-8">
-          <a href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('home'); }} className="hover:text-purple-300 transition-colors">Home</a>
-          <a href="#blogs" onClick={(e) => { e.preventDefault(); scrollToSection('blogs'); }} className="hover:text-purple-300 transition-colors">Blogs</a>
-          <a href="#projects" onClick={(e) => { e.preventDefault(); scrollToSection('projects'); }} className="hover:text-purple-300 transition-colors">Projects</a>
-          <a href="#experience" onClick={(e) => { e.preventDefault(); scrollToSection('experience'); }} className="hover:text-purple-300 transition-colors">Experience</a>
-          <a href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }} className="hover:text-purple-300 transition-colors">Contact</a>
-        </nav> */}
+          <span className="text-lg font-semibold text-[#1e3a5f]">Nisha</span>
+        </button>
 
-        <div className="flex items-center space-x-4">
-          <div className="hidden md:flex items-center space-x-4">
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-purple-300 transition-colors">
-              <Linkedin size={20} />
-            </a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-purple-300 transition-colors">
-              <Twitter size={20} />
-            </a>
-          </div>
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+        {/* Desktop Nav */}
+        <nav className="hidden lg:flex items-center space-x-8">
+          {navLinks.map((link) => (
+            <button
+              key={link.id}
+              onClick={() => scrollToSection(link.id)}
+              className="text-sm text-gray-600 hover:text-[#1e3a5f] font-medium transition-colors"
+            >
+              {link.label}
+            </button>
+          ))}
+        </nav>
+
+        {/* Right Section */}
+        <div className="hidden lg:flex items-center space-x-4">
+          <a href="https://www.linkedin.com/in/-nisha-sharma/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1e3a5f] transition-colors">
+            <Linkedin size={18} />
+          </a>
+          <a href="https://x.com/nishashrm75" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1e3a5f] transition-colors">
+            <Twitter size={18} />
+          </a>
+          <a href="https://youtube.com/@finsightswithnisha" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1e3a5f] transition-colors">
+            <Youtube size={18} />
+          </a>
+          <a href="https://medium.com/@nishashrm75" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1e3a5f] transition-colors font-bold text-sm leading-none" title="Medium">
+            M
+          </a>
         </div>
+
+        {/* Mobile Toggle */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="lg:hidden p-2 text-gray-600"
+        >
+          {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </div>
 
+      {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-slate-900/95 backdrop-blur-lg pb-4">
-          <nav className="flex flex-col items-center space-y-4 pt-4">
-            {/* <a href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('home'); }} className="hover:text-purple-300 transition-colors py-2">Home</a>
-            <a href="#blogs" onClick={(e) => { e.preventDefault(); scrollToSection('blogs'); }} className="hover:text-purple-300 transition-colors py-2">Blogs</a> */}
-            <a href="#projects" onClick={(e) => { e.preventDefault(); scrollToSection('projects'); }} className="hover:text-purple-300 transition-colors py-2">Projects</a>
-            <a href="#experience" onClick={(e) => { e.preventDefault(); scrollToSection('experience'); }} className="hover:text-purple-300 transition-colors py-2">Experience</a>
-            <a href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }} className="hover:text-purple-300 transition-colors py-2">Contact</a>
-            <div className="flex items-center space-x-6 pt-4 border-t border-slate-700 w-full justify-center">
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-purple-300">
-                <Linkedin size={22} />
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-purple-300">
-                <Twitter size={22} />
-              </a>
-            </div>
+        <div className="lg:hidden bg-white border-t border-gray-100 py-4 px-6">
+          <nav className="flex flex-col space-y-3">
+            {navLinks.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => scrollToSection(link.id)}
+                className="text-left text-gray-600 hover:text-[#1e3a5f] font-medium py-2"
+              >
+                {link.label}
+              </button>
+            ))}
           </nav>
+          <div className="flex items-center space-x-4 pt-4 mt-4 border-t border-gray-100">
+            <a href="https://www.linkedin.com/in/-nisha-sharma/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1e3a5f]">
+              <Linkedin size={18} />
+            </a>
+            <a href="https://x.com/nishashrm75" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1e3a5f]">
+              <Twitter size={18} />
+            </a>
+            <a href="https://youtube.com/@finsightswithnisha" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1e3a5f]">
+              <Youtube size={18} />
+            </a>
+            <a href="https://medium.com/@nishashrm75" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1e3a5f] font-bold text-sm leading-none" title="Medium">
+              M
+            </a>
+          </div>
         </div>
       )}
     </header>

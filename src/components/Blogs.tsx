@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, Clock, ArrowRight, X, Eye, BookOpen, PenTool, FileText } from 'lucide-react';
+import { Calendar, Clock, ArrowRight, X, Eye, ExternalLink } from 'lucide-react';
 
 interface Blog {
   title: string;
@@ -41,127 +41,128 @@ const blogs: Blog[] = [
   }
 ];
 
+const categoryColors: Record<string, string> = {
+  'Tax Law': 'bg-blue-50 text-blue-700',
+  'Business Finance': 'bg-emerald-50 text-emerald-700',
+  'Personal Finance': 'bg-amber-50 text-amber-700',
+};
+
 const Blogs = () => {
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
 
   return (
-    <section 
-      id="blogs" 
-      className="py-20 relative overflow-hidden min-h-screen"
-      style={{
-        backgroundImage: `linear-gradient(rgba(248, 250, 252, 0.95), rgba(241, 245, 249, 0.95)), url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')`
-      }}
-    >
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <BookOpen className="absolute top-20 left-10 w-12 h-12 text-purple-200/40 animate-float" />
-        <PenTool className="absolute top-40 right-20 w-8 h-8 text-blue-200/40 animate-float delay-500" />
-        <FileText className="absolute bottom-40 left-20 w-10 h-10 text-green-200/40 animate-float delay-1000" />
-      </div>
-
-      <div className="container mx-auto px-6 relative z-10">
+    <section id="blogs" className="py-20 bg-[#f8fafc]">
+      <div className="container mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="text-center mb-16 animate-fade-in-up">
-          <span className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-600/30 rounded-full text-purple-700 text-sm font-bold mb-6 backdrop-blur-lg">
-            📚 Knowledge Hub
-          </span>
-          <h2 className="text-4xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-gray-800 via-purple-600 to-gray-800 bg-clip-text text-transparent animate-fade-in-up delay-300">
-            Latest Insights & Articles
+        <div className="text-center mb-14">
+          <p className="text-[#c8a951] font-semibold text-sm tracking-widest uppercase mb-3">Insights</p>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#1e3a5f] mb-4">
+            Latest Articles
           </h2>
-          <p className="text-xl lg:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed animate-fade-in-up delay-500">
+          <p className="text-gray-600 max-w-2xl mx-auto">
             Stay updated with the latest trends, regulations, and best practices in accounting, taxation, and financial management.
           </p>
         </div>
 
         {/* Blog Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in-up delay-700">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {blogs.map((blog, index) => (
-            <article 
-              key={index} 
-              className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden group card-hover border border-white/50"
-              style={{ animationDelay: `${index * 0.2}s` }}
+            <article
+              key={index}
+              className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col"
             >
-              {/* Category Badge */}
-              <div className="p-8 pb-6">
-                <div className="flex items-center justify-between mb-6">
-                  <span className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full text-xs font-bold shadow-lg">
+              <div className="p-6 flex flex-col flex-1">
+                <div className="flex items-center justify-between mb-4">
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${categoryColors[blog.category] || 'bg-gray-100 text-gray-700'}`}>
                     {blog.category}
                   </span>
-                  <div className="flex items-center text-gray-500 text-xs font-medium">
-                    <Eye className="w-4 h-4 mr-1" />
+                  <div className="flex items-center text-gray-400 text-xs">
+                    <Eye className="w-3.5 h-3.5 mr-1" />
                     {blog.views}
                   </div>
                 </div>
-                
-                <h3 className="text-2xl font-bold mb-4 text-gray-800 line-clamp-2 group-hover:text-purple-600 transition-colors leading-tight">
+
+                <h3 className="text-lg font-semibold text-[#1e3a5f] mb-3 line-clamp-2 hover:text-[#2a5a8f] transition-colors">
                   {blog.title}
                 </h3>
-                
-                <p className="text-gray-600 mb-6 line-clamp-3 text-sm leading-relaxed">
+
+                <p className="text-sm text-gray-500 mb-4 line-clamp-3 flex-1">
                   {blog.excerpt}
                 </p>
-                
-                {/* Meta Info */}
-                <div className="flex items-center justify-between text-xs text-gray-500 mb-6 font-medium">
+
+                <div className="flex items-center justify-between text-xs text-gray-400 mb-4 pt-4 border-t border-gray-100">
                   <div className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-2 text-purple-500" />
+                    <Calendar className="w-3.5 h-3.5 mr-1.5" />
                     {blog.date}
                   </div>
                   <div className="flex items-center">
-                    <Clock className="w-4 h-4 mr-2 text-purple-500" />
+                    <Clock className="w-3.5 h-3.5 mr-1.5" />
                     {blog.readTime}
                   </div>
                 </div>
-                
-                <button 
+
+                <button
                   onClick={() => setSelectedBlog(blog)}
-                  className="group/btn flex items-center text-purple-600 font-bold text-sm hover:text-purple-700 transition-all duration-300 hover:scale-105"
+                  className="flex items-center text-[#1e3a5f] font-medium text-sm hover:text-[#c8a951] transition-colors group"
                 >
-                  Read Full Article
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover/btn:translate-x-2 transition-transform" />
+                  Read Article
+                  <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </article>
           ))}
         </div>
 
+        {/* Medium CTA Banner */}
+        <a
+          href="https://medium.com/@nishashrm75"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group mt-12 flex items-center justify-between bg-white border-2 border-gray-200 rounded-xl p-6 sm:p-8 hover:border-[#1e3a5f] hover:shadow-lg transition-all duration-300"
+        >
+          <div className="flex items-center gap-4 sm:gap-5">
+            {/* Medium "M" logo */}
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#1e3a5f] rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+              <span className="text-white font-bold text-xl sm:text-2xl">M</span>
+            </div>
+            <div>
+              <h3 className="text-lg sm:text-xl font-bold text-[#1e3a5f] mb-1">Read more on Medium</h3>
+              <p className="text-sm text-gray-500">Follow me for in-depth articles on taxation, finance & compliance</p>
+            </div>
+          </div>
+          <div className="hidden sm:flex items-center gap-2 text-[#1e3a5f] font-semibold group-hover:text-[#c8a951] transition-colors">
+            <span>Visit</span>
+            <ExternalLink className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+          </div>
+        </a>
+
         {/* Blog Modal */}
         {selectedBlog && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in-up">
-            <div className="bg-white rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-4 border-purple-200">
-              {/* Modal Header */}
-              <div className="sticky top-0 bg-white/95 backdrop-blur-lg border-b border-gray-200 p-8 flex items-center justify-between">
-                <div className="flex items-center space-x-6">
-                  <span className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full text-sm font-bold">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl max-w-3xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
+              <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${categoryColors[selectedBlog.category] || 'bg-gray-100 text-gray-700'}`}>
                     {selectedBlog.category}
                   </span>
-                  <div className="flex items-center text-gray-600 text-sm font-medium">
-                    <Calendar className="w-5 h-5 mr-2 text-purple-500" />
-                    {selectedBlog.date}
-                  </div>
-                  <div className="flex items-center text-gray-600 text-sm font-medium">
-                    <Clock className="w-5 h-5 mr-2 text-purple-500" />
-                    {selectedBlog.readTime}
-                  </div>
+                  <span className="text-sm text-gray-400">{selectedBlog.date}</span>
+                  <span className="text-sm text-gray-400">{selectedBlog.readTime}</span>
                 </div>
-                <button 
+                <button
                   onClick={() => setSelectedBlog(null)}
-                  className="p-3 hover:bg-gray-100 rounded-full transition-colors hover:scale-110"
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <X className="w-6 h-6 text-gray-600" />
+                  <X className="w-5 h-5 text-gray-500" />
                 </button>
               </div>
-              
-              {/* Modal Content */}
-              <div className="p-8">
-                <h3 className="text-4xl font-bold mb-8 text-gray-800 leading-tight">
+
+              <div className="p-6 lg:p-8">
+                <h3 className="text-2xl lg:text-3xl font-bold text-[#1e3a5f] mb-6">
                   {selectedBlog.title}
                 </h3>
-                <div className="prose prose-xl max-w-none text-gray-700 leading-relaxed">
+                <div className="text-gray-600 leading-relaxed text-base">
                   {selectedBlog.content.split('\n').map((paragraph, index) => (
-                    <p key={index} className="mb-6 text-lg">
-                      {paragraph}
-                    </p>
+                    <p key={index} className="mb-4">{paragraph}</p>
                   ))}
                 </div>
               </div>

@@ -1,12 +1,4 @@
-import { useState, useEffect } from 'react';
-import { FileText, Shield, Receipt, Building, CheckCircle, ArrowRight, Star, Users, Clock, Award, ChevronLeft, ChevronRight } from 'lucide-react';
-
-const backgroundImages = [
-  'https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', // Office workspace (neutral)
-  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', // Professional businesswoman
-  'https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', // Female financial analyst
-  'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', // Professional woman working
-];
+import { FileText, Shield, Receipt, Building, CheckCircle, ArrowRight, Award, Users, Clock } from 'lucide-react';
 
 const services = [
   {
@@ -22,10 +14,6 @@ const services = [
     ],
     price: 'Starting from ₹1,500',
     duration: '2-3 business days',
-    color: 'from-blue-500 to-indigo-600',
-    bgColor: 'bg-blue-500/10',
-    borderColor: 'border-blue-500/30',
-    delay: '0s'
   },
   {
     id: 'tax-audit',
@@ -40,10 +28,6 @@ const services = [
     ],
     price: 'Starting from ₹15,000',
     duration: '1-2 weeks',
-    color: 'from-green-500 to-emerald-600',
-    bgColor: 'bg-green-500/10',
-    borderColor: 'border-green-500/30',
-    delay: '0.2s'
   },
   {
     id: 'gst-filing',
@@ -58,10 +42,6 @@ const services = [
     ],
     price: 'Starting from ₹2,500/month',
     duration: 'Ongoing support',
-    color: 'from-purple-500 to-violet-600',
-    bgColor: 'bg-purple-500/10',
-    borderColor: 'border-purple-500/30',
-    delay: '0.4s'
   },
   {
     id: 'company-registration',
@@ -76,280 +56,86 @@ const services = [
     ],
     price: 'Starting from ₹8,000',
     duration: '7-10 business days',
-    color: 'from-orange-500 to-red-600',
-    bgColor: 'bg-orange-500/10',
-    borderColor: 'border-orange-500/30',
-    delay: '0.6s'
   }
 ];
 
 const whyChooseUs = [
-  { icon: Award, title: 'Expert CA Professional', description: '5+ years of experience' },
-  { icon: Users, title: '200+ Satisfied Clients', description: 'Trusted by businesses' },
-  { icon: Clock, title: 'Quick Turnaround', description: 'Fast & reliable service' },
-  { icon: CheckCircle, title: '100% Compliance', description: 'Error-free filing' }
+  { icon: Award, title: 'Skilled Professional', description: '2+ years of hands-on experience' },
+  { icon: Users, title: '200+ Satisfied Clients', description: 'Trusted by businesses across India' },
+  { icon: Clock, title: 'Quick Turnaround', description: 'Fast, reliable, and on-time delivery' },
+  { icon: CheckCircle, title: '100% Compliance', description: 'Error-free filing every time' }
 ];
 
 const Services = () => {
-  const [currentBg, setCurrentBg] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentBg((prev) => (prev + 1) % backgroundImages.length);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold: 0.1 }
-    );
-
-    const element = document.getElementById('services');
-    if (element) observer.observe(element);
-
-    return () => observer.disconnect();
-  }, []);
-
-  // Auto-play carousel
-  useEffect(() => {
-    if (!isAutoPlaying) return;
-    
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % services.length);
-    }, 4000);
-    
-    return () => clearInterval(interval);
-  }, [isAutoPlaying]);
-
-  const handleGetStarted = () => {
-    // Scroll to contact section when Get Started is clicked
-    const element = document.getElementById('contact');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % services.length);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000); // Resume auto-play after 10 seconds
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + services.length) % services.length);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000); // Resume auto-play after 10 seconds
-  };
-
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000); // Resume auto-play after 10 seconds
-  };
-
-  // Calculate transform for showing 2.2 cards
-  const getTransform = () => {
-    const cardWidth = 100 / 2.2; // Show 2.2 cards
-    return `translateX(-${currentSlide * cardWidth}%)`;
+  const scrollToContact = () => {
+    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <section id="services" className="relative py-20 overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 z-0">
-        {backgroundImages.map((bg, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentBg ? 'opacity-100' : 'opacity-0'
-            }`}
-            style={{
-              backgroundImage: `url(${bg})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              filter: 'blur(3px)'
-            }}
-          />
-        ))}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/85 via-blue-900/80 to-slate-900/85"></div>
-      </div>
-
-      {/* Floating Elements */}
-      <div className="absolute inset-0 z-10">
-        <div className="absolute top-20 left-20 w-32 h-32 bg-blue-500/10 rounded-full animate-float"></div>
-        <div className="absolute top-40 right-32 w-24 h-24 bg-purple-500/10 rounded-full animate-float-delayed"></div>
-        <div className="absolute bottom-32 left-1/4 w-20 h-20 bg-green-500/10 rounded-full animate-float"></div>
-        <div className="absolute bottom-20 right-20 w-28 h-28 bg-orange-500/10 rounded-full animate-float-delayed"></div>
-      </div>
-
-      <div className="container mx-auto px-4 relative z-20">
-        {/* Header Section */}
-        <div className={`text-center mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
-          <h2 className="text-5xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+    <section id="services" className="py-20 bg-white">
+      <div className="container mx-auto px-4 sm:px-6">
+        {/* Header */}
+        <div className="text-center mb-12 sm:mb-16">
+          <p className="text-[#c8a951] font-semibold text-sm tracking-widest uppercase mb-3">What I Offer</p>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#1e3a5f] mb-4">
             Professional Services
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          <p className="text-gray-600 max-w-2xl mx-auto">
             Comprehensive financial and compliance services tailored to meet your business needs with expertise and precision.
           </p>
         </div>
 
-        {/* Services Carousel */}
-        <div className="relative mb-16 group">
-          {/* Navigation Arrows - Only visible on hover */}
-          <button
-            onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-white/20 backdrop-blur-lg p-3 rounded-full border border-white/30 hover:bg-white/30 transition-all duration-300 transform hover:scale-110 carousel-arrow-left opacity-0 group-hover:opacity-100"
-            onMouseEnter={() => setIsAutoPlaying(false)}
-            onMouseLeave={() => setIsAutoPlaying(true)}
-          >
-            <ChevronLeft className="w-6 h-6 text-white hover:text-blue-300 transition-colors duration-300" />
-          </button>
-          
-          <button
-            onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-white/20 backdrop-blur-lg p-3 rounded-full border border-white/30 hover:bg-white/30 transition-all duration-300 transform hover:scale-110 carousel-arrow-right opacity-0 group-hover:opacity-100"
-            onMouseEnter={() => setIsAutoPlaying(false)}
-            onMouseLeave={() => setIsAutoPlaying(true)}
-          >
-            <ChevronRight className="w-6 h-6 text-white hover:text-blue-300 transition-colors duration-300" />
-          </button>
-
-          {/* Carousel Container */}
-          <div className="overflow-hidden rounded-2xl">
-            <div 
-              className="flex transition-transform duration-500 ease-in-out"
-              style={{ transform: getTransform() }}
+        {/* Services Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-16 sm:mb-20">
+          {services.map((service) => (
+            <div
+              key={service.id}
+              className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-[#1e3a5f]/20 transition-all duration-300 group"
             >
-              {services.map((service) => (
-                <div
-                  key={service.id}
-                  className="flex-shrink-0 px-3"
-                  style={{ width: `${100 / 2.2}%` }}
-                  onMouseEnter={() => setIsAutoPlaying(false)}
-                  onMouseLeave={() => setIsAutoPlaying(true)}
-                >
-                  <div className={`group/card bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl ${
-                    isVisible ? 'animate-slide-up' : 'opacity-0'
-                  } h-96`}>
-                    {/* Service Header */}
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className={`p-3 rounded-xl ${service.bgColor} ${service.borderColor} border-2 group-hover/card:scale-110 transition-transform duration-300`}>
-                        <service.icon className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-white mb-1">{service.title}</h3>
-                        <p className="text-xs text-gray-300 line-clamp-2">{service.description}</p>
-                      </div>
-                    </div>
+              <div className="w-12 h-12 bg-[#f0f4f8] rounded-lg flex items-center justify-center mb-4 group-hover:bg-[#1e3a5f] transition-colors">
+                <service.icon className="w-6 h-6 text-[#1e3a5f] group-hover:text-white transition-colors" />
+              </div>
 
-                    {/* Features List - Compact */}
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-white mb-2 flex items-center">
-                        <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
-                        Key Features
-                      </h4>
-                      <ul className="space-y-1">
-                        {service.features.slice(0, 3).map((feature, idx) => (
-                          <li key={idx} className="flex items-center text-xs text-gray-300">
-                            <Star className="w-3 h-3 text-yellow-400 mr-2 flex-shrink-0" />
-                            <span className="truncate">{feature}</span>
-                          </li>
-                        ))}
-                        {service.features.length > 3 && (
-                          <li className="text-xs text-gray-400 ml-5">+{service.features.length - 3} more features</li>
-                        )}
-                      </ul>
-                    </div>
+              <h3 className="text-lg font-semibold text-[#1e3a5f] mb-2">{service.title}</h3>
+              <p className="text-sm text-gray-500 mb-4 line-clamp-2">{service.description}</p>
 
-                    {/* Service Details - Compact */}
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-                      <div>
-                        <p className="text-xs text-gray-400 mb-1">Starting Price</p>
-                        <p className="text-sm font-semibold text-green-400">{service.price}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-400 mb-1">Turnaround</p>
-                        <p className="text-sm font-semibold text-blue-400">{service.duration}</p>
-                      </div>
-                    </div>
+              <ul className="space-y-2 mb-5">
+                {service.features.map((feature, idx) => (
+                  <li key={idx} className="flex items-start text-sm text-gray-600">
+                    <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
 
-                    {/* CTA Button - Compact */}
-                    <button
-                      onClick={handleGetStarted}
-                      className={`w-full py-2 bg-gradient-to-r ${service.color} text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 text-sm`}
-                    >
-                      <span>Get Started</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+              <div className="pt-4 border-t border-gray-100 space-y-1 mb-4">
+                <p className="text-sm"><span className="text-gray-400">Price:</span> <span className="font-semibold text-[#1e3a5f]">{service.price}</span></p>
+                <p className="text-sm"><span className="text-gray-400">Duration:</span> <span className="font-medium text-gray-700">{service.duration}</span></p>
+              </div>
 
-          {/* Pagination Dots */}
-          <div className="flex justify-center space-x-2 mt-6">
-            {services.map((_, index) => (
               <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentSlide 
-                    ? 'bg-white shadow-lg' 
-                    : 'bg-white/40 hover:bg-white/60'
-                }`}
-                onMouseEnter={() => setIsAutoPlaying(false)}
-                onMouseLeave={() => setIsAutoPlaying(true)}
-              />
-            ))}
-          </div>
-
-          {/* Auto-play Indicator */}
-          <div className="flex justify-center mt-4">
-            <div className={`text-xs text-gray-400 flex items-center space-x-2 ${isAutoPlaying ? 'opacity-100' : 'opacity-50'}`}>
-              <div className={`w-2 h-2 rounded-full ${isAutoPlaying ? 'bg-green-400 animate-pulse-glow' : 'bg-gray-400'}`}></div>
-              <span>{isAutoPlaying ? 'Auto-playing' : 'Paused - Hover to control'}</span>
+                onClick={scrollToContact}
+                className="w-full py-2.5 border border-[#1e3a5f] text-[#1e3a5f] text-sm font-medium rounded-lg hover:bg-[#1e3a5f] hover:text-white transition-colors flex items-center justify-center gap-2"
+              >
+                Get Started <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
-          </div>
+          ))}
         </div>
 
-        {/* Why Choose Us Section */}
-        <div className={`${isVisible ? 'animate-slide-up' : 'opacity-0'}`} style={{ animationDelay: '0.8s' }}>
-          <h3 className="text-3xl font-bold text-white text-center mb-12">Why Choose Our Services?</h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Why Choose Us */}
+        <div className="bg-[#f8fafc] rounded-2xl p-6 sm:p-10 lg:p-14">
+          <h3 className="text-xl sm:text-2xl font-bold text-[#1e3a5f] text-center mb-8 sm:mb-10">Why Choose Me?</h3>
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
             {whyChooseUs.map((item, index) => (
-              <div
-                key={index}
-                className="text-center p-6 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:scale-105"
-              >
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4">
-                  <item.icon className="w-8 h-8 text-white" />
+              <div key={index} className="text-center">
+                <div className="w-14 h-14 bg-white rounded-xl shadow-sm flex items-center justify-center mx-auto mb-4 border border-gray-100">
+                  <item.icon className="w-7 h-7 text-[#1e3a5f]" />
                 </div>
-                <h4 className="text-xl font-semibold text-white mb-2">{item.title}</h4>
-                <p className="text-gray-300 text-sm">{item.description}</p>
+                <h4 className="font-semibold text-[#1e3a5f] mb-1">{item.title}</h4>
+                <p className="text-sm text-gray-500">{item.description}</p>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Bottom CTA */}
-        <div className={`text-center mt-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`} style={{ animationDelay: '1s' }}>
-          <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-lg p-8 rounded-2xl border border-white/20">
-            <h3 className="text-2xl font-bold text-white mb-4">Ready to Get Started?</h3>
-            <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-              Let's discuss your requirements and provide you with the best financial solutions for your business growth.
-            </p>
-            <button className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-500 to-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:from-green-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-300">
-              <span>Schedule a Consultation</span>
-              <ArrowRight className="w-5 h-5" />
-            </button>
           </div>
         </div>
       </div>
