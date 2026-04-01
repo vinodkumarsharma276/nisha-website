@@ -26,8 +26,6 @@ dist-ssr
 # Playwright MCP
 .playwright-mcp/
 
-# Claude Code
-.claude/
 
 # Screenshots
 *.png
