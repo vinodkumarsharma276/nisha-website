@@ -24,11 +24,11 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact" className="py-20 bg-[#1e3a5f]">
+    <section id="contact" className="py-20 bg-[#0f172a]">
       <div className="container mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-14">
-          <p className="text-[#c8a951] font-semibold text-sm tracking-widest uppercase mb-3">Get In Touch</p>
+          <p className="text-[#0e7490] font-semibold text-sm tracking-widest uppercase mb-3">Get In Touch</p>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">Let's Work Together</h2>
           <p className="text-gray-300 max-w-2xl mx-auto">
             Ready to take your business to the next level? Let's discuss how I can help you achieve your financial goals.
@@ -37,15 +37,15 @@ const Contact = () => {
 
         <div className="grid lg:grid-cols-2 gap-10 max-w-5xl mx-auto">
           {/* Contact Form */}
-          <div className="bg-white rounded-xl p-4 sm:p-6 lg:p-8">
-            <h3 className="text-xl font-semibold text-[#1e3a5f] mb-6">Send a Message</h3>
+          <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 card-hover">
+            <h3 className="text-xl font-semibold text-[#0e7490] mb-6">Send a Message</h3>
 
             {isSubmitted ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="w-8 h-8 text-green-600" />
                 </div>
-                <h4 className="text-lg font-semibold text-[#1e3a5f] mb-2">Message Sent!</h4>
+                <h4 className="text-lg font-semibold text-[#0e7490] mb-2">Message Sent!</h4>
                 <p className="text-gray-500">I'll get back to you within 24 hours.</p>
               </div>
             ) : (
@@ -60,7 +60,7 @@ const Contact = () => {
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-colors"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0e7490]/20 focus:border-[#0e7490] transition-colors"
                       placeholder="Your name"
                     />
                   </div>
@@ -73,7 +73,7 @@ const Contact = () => {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-colors"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0e7490]/20 focus:border-[#0e7490] transition-colors"
                       placeholder="your@email.com"
                     />
                   </div>
@@ -88,7 +88,7 @@ const Contact = () => {
                     value={formData.subject}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-colors"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0e7490]/20 focus:border-[#0e7490] transition-colors"
                     placeholder="How can I help?"
                   />
                 </div>
@@ -102,14 +102,14 @@ const Contact = () => {
                     onChange={handleChange}
                     required
                     rows={5}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-colors resize-none"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0e7490]/20 focus:border-[#0e7490] transition-colors resize-none"
                     placeholder="Tell me about your requirements..."
                   ></textarea>
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-[#1e3a5f] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#16304d] transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-[#0f172a] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#1e293b] transition-colors flex items-center justify-center gap-2"
                 >
                   <Send className="w-4 h-4" />
                   Send Message
@@ -125,7 +125,7 @@ const Contact = () => {
               <div className="space-y-4">
                 <div className="flex items-start">
                   <div className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                    <Mail className="w-4 h-4 text-[#c8a951]" />
+                    <Mail className="w-4 h-4 text-[#0e7490]" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-400">Email</p>
@@ -134,7 +134,7 @@ const Contact = () => {
                 </div>
                 <div className="flex items-start">
                   <div className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                    <MapPin className="w-4 h-4 text-[#c8a951]" />
+                    <MapPin className="w-4 h-4 text-[#0e7490]" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-400">Location</p>
@@ -143,7 +143,7 @@ const Contact = () => {
                 </div>
                 <div className="flex items-start">
                   <div className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                    <Clock className="w-4 h-4 text-[#c8a951]" />
+                    <Clock className="w-4 h-4 text-[#0e7490]" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-400">Business Hours</p>
@@ -166,7 +166,7 @@ const Contact = () => {
                   'Risk Assessment'
                 ].map((service, index) => (
                   <div key={index} className="flex items-center text-sm text-gray-300">
-                    <span className="w-1.5 h-1.5 bg-[#c8a951] rounded-full mr-2"></span>
+                    <span className="w-1.5 h-1.5 bg-[#0f172a] rounded-full mr-2"></span>
                     {service}
                   </div>
                 ))}

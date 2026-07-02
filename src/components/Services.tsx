@@ -76,12 +76,12 @@ const Services = () => {
       <div className="container mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-12 sm:mb-16">
-          <p className="text-[#c8a951] font-semibold text-sm tracking-widest uppercase mb-3">What I Offer</p>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#1e3a5f] mb-4">
+          <p className="text-[#0e7490] font-semibold text-sm tracking-widest uppercase mb-3">What I Offer</p>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0f172a] mb-4">
             Professional Services
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Comprehensive financial and compliance services tailored to meet your business needs with expertise and precision.
+            Clear pricing. Fast turnaround. Complete compliance. Services designed so you can focus on growing your business.
           </p>
         </div>
 
@@ -90,13 +90,13 @@ const Services = () => {
           {services.map((service) => (
             <div
               key={service.id}
-              className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-[#1e3a5f]/20 transition-all duration-300 group"
+              className="bg-white border border-gray-200 rounded-2xl p-6 card-hover hover:border-[#0e7490]/20 group"
             >
-              <div className="w-12 h-12 bg-[#f0f4f8] rounded-lg flex items-center justify-center mb-4 group-hover:bg-[#1e3a5f] transition-colors">
-                <service.icon className="w-6 h-6 text-[#1e3a5f] group-hover:text-white transition-colors" />
+              <div className="w-12 h-12 bg-[#e0e7ff] rounded-lg flex items-center justify-center mb-4 group-hover:bg-[#0e7490] transition-colors">
+                <service.icon className="w-6 h-6 text-[#0e7490] group-hover:text-white transition-colors" />
               </div>
 
-              <h3 className="text-lg font-semibold text-[#1e3a5f] mb-2">{service.title}</h3>
+              <h3 className="text-lg font-semibold text-[#0f172a] mb-2">{service.title}</h3>
               <p className="text-sm text-gray-500 mb-4 line-clamp-2">{service.description}</p>
 
               <ul className="space-y-2 mb-5">
@@ -109,13 +109,13 @@ const Services = () => {
               </ul>
 
               <div className="pt-4 border-t border-gray-100 space-y-1 mb-4">
-                <p className="text-sm"><span className="text-gray-400">Price:</span> <span className="font-semibold text-[#1e3a5f]">{service.price}</span></p>
+                <p className="text-sm"><span className="text-gray-400">Price:</span> <span className="font-semibold text-[#0f172a]">{service.price}</span></p>
                 <p className="text-sm"><span className="text-gray-400">Duration:</span> <span className="font-medium text-gray-700">{service.duration}</span></p>
               </div>
 
               <button
                 onClick={scrollToContact}
-                className="w-full py-2.5 border border-[#1e3a5f] text-[#1e3a5f] text-sm font-medium rounded-lg hover:bg-[#1e3a5f] hover:text-white transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2.5 border border-[#0f172a] text-[#0f172a] text-sm font-medium rounded-lg hover:bg-[#0f172a] hover:text-white transition-colors flex items-center justify-center gap-2"
               >
                 Get Started <ArrowRight className="w-4 h-4" />
               </button>
@@ -125,14 +125,14 @@ const Services = () => {
 
         {/* Why Choose Us */}
         <div className="bg-[#f8fafc] rounded-2xl p-6 sm:p-10 lg:p-14">
-          <h3 className="text-xl sm:text-2xl font-bold text-[#1e3a5f] text-center mb-8 sm:mb-10">Why Choose Me?</h3>
+          <h3 className="text-xl sm:text-2xl font-bold text-[#0f172a] text-center mb-8 sm:mb-10">Why Clients Choose to Work With Me</h3>
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
             {whyChooseUs.map((item, index) => (
               <div key={index} className="text-center">
                 <div className="w-14 h-14 bg-white rounded-xl shadow-sm flex items-center justify-center mx-auto mb-4 border border-gray-100">
-                  <item.icon className="w-7 h-7 text-[#1e3a5f]" />
+                  <item.icon className="w-7 h-7 text-[#0f172a]" />
                 </div>
-                <h4 className="font-semibold text-[#1e3a5f] mb-1">{item.title}</h4>
+                <h4 className="font-semibold text-[#0f172a] mb-1">{item.title}</h4>
                 <p className="text-sm text-gray-500">{item.description}</p>
               </div>
             ))}

@@ -70,11 +70,11 @@ const Projects = () => {
     <section id="projects" className="py-20 bg-white">
       <div className="container mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="text-center mb-14">
-          <p className="text-[#c8a951] font-semibold text-sm tracking-widest uppercase mb-3">Case Studies</p>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#1e3a5f] mb-4">Featured Projects</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Explore some of my most impactful work in financial consulting, auditing, and business transformation.
+        <div className="text-center mb-12 lg:mb-14">
+          <p className="text-[#0e7490] font-semibold text-sm tracking-widest uppercase mb-3">Proven Capabilities</p>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0f172a] mb-3">Selected Client Work</h2>
+          <p className="text-gray-600 max-w-xl mx-auto">
+            Real examples of how I’ve helped clients with complex compliance, tax optimization, and financial clarity.
           </p>
         </div>
 
@@ -83,19 +83,19 @@ const Projects = () => {
           {projects.map((project, index) => (
             <div
               key={index}
-              className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300"
+              className="bg-white border border-gray-200 rounded-2xl overflow-hidden card-hover"
             >
               <div className="p-4 sm:p-6 lg:p-8">
                 <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
                   {/* Main Content */}
                   <div className="lg:w-2/3">
                     <div className="flex items-center mb-4">
-                      <div className="w-10 h-10 bg-[#f0f4f8] rounded-lg flex items-center justify-center mr-3 text-[#1e3a5f]">
+                      <div className="w-10 h-10 bg-[#e0e7ff] rounded-lg flex items-center justify-center mr-3 text-[#0f172a]">
                         {project.icon}
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold text-[#1e3a5f]">{project.title}</h3>
-                        <p className="text-sm text-[#c8a951] font-medium">{project.industry}</p>
+                        <h3 className="text-xl font-semibold text-[#0f172a]">{project.title}</h3>
+                        <p className="text-sm text-[#0e7490] font-medium">{project.industry}</p>
                       </div>
                     </div>
 
@@ -114,7 +114,7 @@ const Projects = () => {
 
                     {/* Results */}
                     <div>
-                      <h4 className="text-sm font-semibold text-[#1e3a5f] mb-3">Key Results</h4>
+                      <h4 className="text-sm font-semibold text-[#0f172a] mb-3">Key Results</h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {project.results.map((result, i) => (
                           <div key={i} className="flex items-center text-sm text-gray-600">
@@ -129,7 +129,7 @@ const Projects = () => {
                   {/* Sidebar */}
                   <div className="lg:w-1/3 space-y-4">
                     <div className="bg-[#f8fafc] rounded-lg p-5">
-                      <h4 className="text-sm font-semibold text-[#1e3a5f] mb-4">Project Details</h4>
+                      <h4 className="text-sm font-semibold text-[#0f172a] mb-4">Project Details</h4>
                       <div className="space-y-3">
                         <div className="flex items-center text-sm">
                           <Calendar className="w-4 h-4 text-gray-400 mr-2" />
@@ -145,7 +145,7 @@ const Projects = () => {
                     </div>
 
                     <div className="bg-[#f8fafc] rounded-lg p-5">
-                      <h4 className="text-sm font-semibold text-[#1e3a5f] mb-3">Tools Used</h4>
+                      <h4 className="text-sm font-semibold text-[#0f172a] mb-3">Tools Used</h4>
                       <div className="flex flex-wrap gap-2">
                         {project.technologies.map((tech, i) => (
                           <span key={i} className="px-2.5 py-1 bg-white border border-gray-200 rounded text-xs text-gray-600 font-medium">
