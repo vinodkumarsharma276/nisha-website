@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Linkedin, Twitter, Menu, X, Youtube } from 'lucide-react';
 
@@ -13,10 +13,39 @@ const blogLink = { label: 'Blog', to: '/blog' };
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
   const location = useLocation();
   const navigate = useNavigate();
 
   const isBlogActive = location.pathname === '/blog';
+
+  // Scroll-spy: highlight the nav tab for the section currently in view (home route only)
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      setActiveSection('');
+      return;
+    }
+    const ids = scrollNavLinks.map((l) => l.id);
+    const handler = () => {
+      const offset = 90;
+      let current = ids[0];
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= offset) current = id;
+      }
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 4) {
+        current = ids[ids.length - 1];
+      }
+      setActiveSection(current);
+    };
+    handler();
+    window.addEventListener('scroll', handler, { passive: true });
+    window.addEventListener('resize', handler);
+    return () => {
+      window.removeEventListener('scroll', handler);
+      window.removeEventListener('resize', handler);
+    };
+  }, [location.pathname]);
 
   const scrollToSection = (id: string) => {
     setIsMobileMenuOpen(false);
@@ -57,15 +86,20 @@ const Header = () => {
 
         {/* Desktop Nav - Animated tabs */}
         <nav className="hidden lg:flex items-center space-x-8">
-          {scrollNavLinks.map((link) => (
-            <button
-              key={link.id}
-              onClick={() => scrollToSection(link.id)}
-              className="nav-tab text-sm text-gray-600 hover:text-[#0f172a] font-medium relative transition-all duration-200 hover:-translate-y-px active:scale-[0.985]"
-            >
-              {link.label}
-            </button>
-          ))}
+          {scrollNavLinks.map((link) => {
+            const active = location.pathname === '/' && activeSection === link.id;
+            return (
+              <button
+                key={link.id}
+                onClick={() => scrollToSection(link.id)}
+                className={`nav-tab text-sm font-medium transition-all duration-200 hover:-translate-y-px active:scale-[0.985] ${
+                  active ? 'nav-tab-active text-[#0f172a] font-semibold' : 'text-gray-600 hover:text-[#0f172a]'
+                }`}
+              >
+                {link.label}
+              </button>
+            );
+          })}
 
           {/* Blog tab - React Router + active state (pure client navigation) */}
           <button
@@ -73,16 +107,13 @@ const Header = () => {
               navigate(blogLink.to);
               goToBlog();
             }}
-            className={`nav-tab text-sm font-medium relative transition-all duration-200 hover:-translate-y-px active:scale-[0.985] ${
-              isBlogActive 
-                ? 'text-[#0f172a] font-semibold' 
+            className={`nav-tab text-sm font-medium transition-all duration-200 hover:-translate-y-px active:scale-[0.985] ${
+              isBlogActive
+                ? 'nav-tab-active text-[#0f172a] font-semibold'
                 : 'text-gray-600 hover:text-[#0f172a]'
             }`}
           >
             {blogLink.label}
-            {isBlogActive && (
-              <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-[#0e7490] rounded" />
-            )}
           </button>
         </nav>
 
@@ -125,15 +156,18 @@ const Header = () => {
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-white border-t border-gray-100 py-4 px-6">
           <nav className="flex flex-col space-y-1">
-            {scrollNavLinks.map((link) => (
-              <button
-                key={link.id}
-                onClick={() => scrollToSection(link.id)}
-                className="text-left text-gray-600 hover:text-[#0f172a] font-medium py-2.5"
-              >
-                {link.label}
-              </button>
-            ))}
+            {scrollNavLinks.map((link) => {
+              const active = location.pathname === '/' && activeSection === link.id;
+              return (
+                <button
+                  key={link.id}
+                  onClick={() => scrollToSection(link.id)}
+                  className={`text-left font-medium py-2.5 ${active ? 'text-[#0e7490] font-semibold' : 'text-gray-600 hover:text-[#0f172a]'}`}
+                >
+                  {link.label}
+                </button>
+              );
+            })}
 
             {/* Blog in mobile */}
             <button

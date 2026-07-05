@@ -36,6 +36,7 @@ const AdminBlogForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [existingBlogs, setExistingBlogs] = useState<Blog[]>([]);
+  const [view, setView] = useState<'list' | 'form'>('list');
 
   // Rich text editor (TipTap)
   const editor = useEditor({
@@ -111,6 +112,8 @@ const AdminBlogForm: React.FC = () => {
       await supabase.auth.signOut();
     }
     setIsAuthenticated(false);
+    setView('list');
+    setEditingId(null);
     setFormData({
       title: '',
       excerpt: '',
@@ -155,6 +158,17 @@ const AdminBlogForm: React.FC = () => {
       views: blog.views || '0',
     });
     setSubmitStatus('');
+    setView('form');
+  };
+
+  const openAddForm = () => {
+    cancelEdit();
+    setView('form');
+  };
+
+  const backToList = () => {
+    cancelEdit();
+    setView('list');
   };
 
   const cancelEdit = () => {
@@ -242,6 +256,7 @@ const AdminBlogForm: React.FC = () => {
         views: '0',
       });
       loadExisting();
+      setView('list');
 
     } catch (error) {
       console.error('Error saving blog:', error);
@@ -317,12 +332,93 @@ const AdminBlogForm: React.FC = () => {
     );
   }
 
+  if (view === 'list') {
+    return (
+      <div className="min-h-screen bg-[#f1f5f9] pt-16">
+        <div className="container mx-auto px-4 sm:px-6 py-10 max-w-4xl">
+          <div className="flex flex-wrap gap-4 justify-between items-center mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-[#0f172a]">Manage Articles</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                {existingBlogs.length} article{existingBlogs.length === 1 ? '' : 's'}
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={openAddForm}
+                className="bg-[#0e7490] text-white px-5 py-2.5 rounded-lg font-medium hover:opacity-90 transition"
+              >
+                + Add New Blog
+              </button>
+              <button onClick={handleLogout} className="text-sm text-red-600 hover:underline">Logout</button>
+            </div>
+          </div>
+
+          {submitStatus && !submitStatus.includes('Error') && (
+            <div className="mb-6 p-4 rounded-lg text-sm bg-green-50 text-green-700">{submitStatus}</div>
+          )}
+
+          {existingBlogs.length === 0 ? (
+            <div className="bg-white rounded-xl border border-gray-200 p-10 text-center text-gray-500">
+              No articles yet. Click “Add New Blog” to create your first one.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {existingBlogs.map((blog) => (
+                <div key={blog.id} className="bg-white rounded-xl border border-gray-200 p-5 flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${categoryColors[blog.category] || 'bg-gray-100 text-gray-700'}`}>
+                        {blog.category}
+                      </span>
+                      <span className="text-xs text-gray-400">{blog.date}</span>
+                    </div>
+                    <p className="font-semibold text-[#0f172a] truncate">{blog.title}</p>
+                    <p className="text-sm text-gray-500 line-clamp-1">{blog.excerpt}</p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => startEdit(blog)}
+                      className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 text-[#0e7490] hover:bg-gray-50 transition"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(blog.id)}
+                      className="px-3 py-1.5 text-sm rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-8 text-center">
+            <RouterLink to="/" className="text-sm text-[#0e7490] hover:underline">Back to site</RouterLink>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#f1f5f9] pt-16">
       <div className="flex flex-col lg:flex-row h-[calc(100vh-4rem)]">
         {/* Left: Form Section */}
         <div className="lg:w-1/2 overflow-y-auto p-6 lg:p-10 bg-white border-r border-gray-200">
           <div className="max-w-lg mx-auto">
+            <button
+              type="button"
+              onClick={backToList}
+              className="text-sm text-[#0e7490] hover:underline mb-4 inline-flex items-center gap-1"
+            >
+              ← Back to articles
+            </button>
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-3xl font-bold text-[#0f172a]">{editingId != null ? 'Edit Blog' : 'Add New Blog'}</h1>
               <button
@@ -332,55 +428,6 @@ const AdminBlogForm: React.FC = () => {
                 Logout
               </button>
             </div>
-
-            {/* Manage existing articles */}
-            <div className="mb-8">
-              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                Your articles ({existingBlogs.length})
-              </h2>
-              {existingBlogs.length === 0 ? (
-                <p className="text-sm text-gray-400">No articles yet. Add your first one below.</p>
-              ) : (
-                <ul className="space-y-2 max-h-64 overflow-y-auto pr-1">
-                  {existingBlogs.map((blog) => (
-                    <li
-                      key={blog.id}
-                      className={`flex items-center justify-between gap-3 p-3 rounded-lg border ${editingId === blog.id ? 'border-[#0e7490] bg-[#0e7490]/5' : 'border-gray-200'}`}
-                    >
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-[#0f172a] truncate">{blog.title}</p>
-                        <p className="text-xs text-gray-400">{blog.category} · {blog.date}</p>
-                      </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => startEdit(blog)}
-                          className="text-xs text-[#0e7490] hover:underline"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(blog.id)}
-                          className="text-xs text-red-600 hover:underline"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            {editingId != null && (
-              <div className="mb-4 flex items-center justify-between p-3 rounded-lg bg-amber-50 text-amber-800 text-sm">
-                <span>Editing an existing article.</span>
-                <button type="button" onClick={cancelEdit} className="underline hover:no-underline">
-                  Cancel / New
-                </button>
-              </div>
-            )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
