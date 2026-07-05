@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TipTapLink from '@tiptap/extension-link';
-import { supabase } from '../lib/supabase';
+import { supabase, type Blog } from '../lib/supabase';
 import { categoryColors } from '../data/blogs';
 
 interface BlogFormData {
@@ -34,7 +34,8 @@ const AdminBlogForm: React.FC = () => {
   });
   const [submitStatus, setSubmitStatus] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [existingBlogs, setExistingBlogs] = useState<Blog[]>([]);
 
   // Rich text editor (TipTap)
   const editor = useEditor({
@@ -126,6 +127,62 @@ const AdminBlogForm: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Load the admin's existing articles (from Supabase) whenever authenticated
+  const loadExisting = async () => {
+    if (!supabase) return;
+    const { data } = await supabase
+      .from('blogs')
+      .select('*')
+      .order('created_at', { ascending: false });
+    setExistingBlogs((data as Blog[]) ?? []);
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadExisting();
+    }
+  }, [isAuthenticated]);
+
+  const startEdit = (blog: Blog) => {
+    setEditingId(blog.id ?? null);
+    setFormData({
+      title: blog.title || '',
+      excerpt: blog.excerpt || '',
+      content: blog.content || '',
+      date: blog.date || '',
+      readTime: blog.readTime || '5 min read',
+      category: blog.category || 'Tax Law',
+      views: blog.views || '0',
+    });
+    setSubmitStatus('');
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setFormData({
+      title: '',
+      excerpt: '',
+      content: '',
+      date: new Date().toISOString().split('T')[0],
+      readTime: '5 min read',
+      category: 'Tax Law',
+      views: '0',
+    });
+    setSubmitStatus('');
+  };
+
+  const handleDelete = async (id?: number) => {
+    if (!supabase || id == null) return;
+    if (!window.confirm('Delete this article? This cannot be undone.')) return;
+    const { error } = await supabase.from('blogs').delete().eq('id', id);
+    if (error) {
+      setSubmitStatus(`Error deleting: ${error.message}`);
+      return;
+    }
+    if (editingId === id) cancelEdit();
+    loadExisting();
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitStatus('');
@@ -148,7 +205,7 @@ const AdminBlogForm: React.FC = () => {
 
     try {
       // Prepare data for Supabase (match column names)
-      const blogToInsert = {
+      const blogData = {
         title: formData.title,
         excerpt: formData.excerpt,
         content: formData.content,
@@ -158,16 +215,23 @@ const AdminBlogForm: React.FC = () => {
         views: formData.views,
       };
 
-      const { error } = await supabase
-        .from('blogs')
-        .insert([blogToInsert]);
-
-      if (error) {
-        throw error;
+      if (editingId != null) {
+        const { error } = await supabase
+          .from('blogs')
+          .update(blogData)
+          .eq('id', editingId);
+        if (error) throw error;
+        setSubmitStatus('Blog updated successfully!');
+      } else {
+        const { error } = await supabase
+          .from('blogs')
+          .insert([blogData]);
+        if (error) throw error;
+        setSubmitStatus('Blog added successfully!');
       }
-      setSubmitStatus('Blog added successfully! Taking you to the blog list...');
 
-      // Reset form
+      // Reset form + refresh the article list
+      setEditingId(null);
       setFormData({
         title: '',
         excerpt: '',
@@ -177,15 +241,12 @@ const AdminBlogForm: React.FC = () => {
         category: 'Tax Law',
         views: '0',
       });
+      loadExisting();
 
-      // Auto navigate to blog list so the new blog is visible immediately
-      setTimeout(() => {
-        navigate('/blog');
-      }, 1200);
-
-    } catch (error: any) {
-      console.error('Error adding blog:', error);
-      setSubmitStatus(`Error: ${error.message || 'Failed to add blog. Make sure RLS policies allow inserts or use service key for admin.'}`);
+    } catch (error) {
+      console.error('Error saving blog:', error);
+      const message = error instanceof Error ? error.message : 'Failed to save blog.';
+      setSubmitStatus(`Error: ${message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -262,8 +323,8 @@ const AdminBlogForm: React.FC = () => {
         {/* Left: Form Section */}
         <div className="lg:w-1/2 overflow-y-auto p-6 lg:p-10 bg-white border-r border-gray-200">
           <div className="max-w-lg mx-auto">
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-3xl font-bold text-[#0f172a]">Add New Blog</h1>
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-3xl font-bold text-[#0f172a]">{editingId != null ? 'Edit Blog' : 'Add New Blog'}</h1>
               <button
                 onClick={handleLogout}
                 className="text-sm text-red-600 hover:underline"
@@ -271,6 +332,55 @@ const AdminBlogForm: React.FC = () => {
                 Logout
               </button>
             </div>
+
+            {/* Manage existing articles */}
+            <div className="mb-8">
+              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                Your articles ({existingBlogs.length})
+              </h2>
+              {existingBlogs.length === 0 ? (
+                <p className="text-sm text-gray-400">No articles yet. Add your first one below.</p>
+              ) : (
+                <ul className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                  {existingBlogs.map((blog) => (
+                    <li
+                      key={blog.id}
+                      className={`flex items-center justify-between gap-3 p-3 rounded-lg border ${editingId === blog.id ? 'border-[#0e7490] bg-[#0e7490]/5' : 'border-gray-200'}`}
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-[#0f172a] truncate">{blog.title}</p>
+                        <p className="text-xs text-gray-400">{blog.category} · {blog.date}</p>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => startEdit(blog)}
+                          className="text-xs text-[#0e7490] hover:underline"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(blog.id)}
+                          className="text-xs text-red-600 hover:underline"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {editingId != null && (
+              <div className="mb-4 flex items-center justify-between p-3 rounded-lg bg-amber-50 text-amber-800 text-sm">
+                <span>Editing an existing article.</span>
+                <button type="button" onClick={cancelEdit} className="underline hover:no-underline">
+                  Cancel / New
+                </button>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
@@ -448,7 +558,9 @@ const AdminBlogForm: React.FC = () => {
                 disabled={isSubmitting}
                 className="w-full bg-[#0e7490] text-white py-3.5 rounded-lg font-semibold hover:bg-[#0e7490] transition disabled:opacity-60"
               >
-                {isSubmitting ? 'Adding Blog...' : 'Add New Blog'}
+                {isSubmitting
+                  ? (editingId != null ? 'Updating...' : 'Adding Blog...')
+                  : (editingId != null ? 'Update Blog' : 'Add New Blog')}
               </button>
 
               {submitStatus && (

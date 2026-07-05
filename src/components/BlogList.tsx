@@ -1,101 +1,36 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Calendar, Clock, ArrowRight, X, Eye, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { supabase, type Blog } from '../lib/supabase';
-import { blogs as staticBlogs, categoryColors } from '../data/blogs';
-
-function loadDemoBlogs(): Blog[] {
-  try {
-    return JSON.parse(localStorage.getItem('added_blogs') || '[]');
-  } catch {
-    return [];
-  }
-}
+import { type Blog } from '../lib/supabase';
+import { fetchBlogs } from '../lib/blogs';
+import { categoryColors } from '../data/blogs';
 
 const BlogList = () => {
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
-  const [blogList, setBlogList] = useState<Blog[]>(staticBlogs);
-  const [loading, setLoading] = useState(false);
-  const [dbCount, setDbCount] = useState<number | null>(null);
+  const [blogList, setBlogList] = useState<Blog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [category, setCategory] = useState('All');
 
-  const fetchBlogs = async () => {
-    const demoBlogs = loadDemoBlogs().map((b: any) => ({
-      ...b,
-      readTime: b.readTime || b.read_time || '5 min read',
-    })) as Blog[];
-    console.log('[DEBUG] Demo blogs from localStorage:', demoBlogs.length, demoBlogs.map(b => b.title));
-
-    if (!supabase) {
-      // Demo mode: merge static + locally added blogs
-      const all = [...staticBlogs, ...demoBlogs];
-      const unique = Array.from(new Map(all.map(b => [b.title, b])).values());
-      console.log('[DEBUG] No supabase client, using static+demo, count:', unique.length, 'titles:', unique.map((b:any)=>b.title));
-      setBlogList(unique);
-      return;
-    }
+  const loadBlogs = async () => {
     setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('blogs')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      
-      const count = data ? data.length : 0;
-      console.log('[DEBUG] Supabase DB query returned:', count, 'rows');
-      console.log('[DEBUG] DB blog titles:', data ? data.map((b: any) => b.title) : []);
-      setDbCount(count);
-      if (data && data.length > 0) {
-        console.log('[DEBUG] DB blog titles:', data.map((b: any) => b.title));
-        // Assume DB uses camelCase or adjust here. Map if your columns use snake_case.
-        let mapped = (data as any[]).map((b) => ({
-          ...b,
-          readTime: b.readTime || b.read_time || '5 min read',
-        })) as Blog[];
-
-        // Ensure newest first by created_at if available
-        mapped = mapped.sort((a: any, b: any) => {
-          if (a.created_at && b.created_at) {
-            return b.created_at.localeCompare(a.created_at);
-          }
-          return 0;
-        });
-
-        // Merge DB + demo + static. Prefer DB/demo over static for same title.
-        const all = [...staticBlogs, ...demoBlogs, ...mapped];
-        const unique = Array.from(new Map(all.map(b => [b.title, b])).values());
-        // Sort: ones with created_at first (newest), then others
-        const sortedUnique = unique.sort((a: any, b: any) => {
-          if (a.created_at && b.created_at) return b.created_at.localeCompare(a.created_at);
-          if (a.created_at) return -1;
-          if (b.created_at) return 1;
-          return 0;
-        });
-        console.log('[DEBUG] Setting from DB+demo+static, count:', sortedUnique.length, 'titles:', sortedUnique.map((b:any)=>b.title));
-        setBlogList(sortedUnique);
-      } else {
-        // No DB data: merge static + demo
-        const all = [...staticBlogs, ...demoBlogs];
-        const unique = Array.from(new Map(all.map(b => [b.title, b])).values());
-        console.log('[DEBUG] Setting from static+demo (no DB data), count:', unique.length, 'titles:', unique.map((b:any)=>b.title));
-        setBlogList(unique);
-      }
-    } catch (err) {
-      console.error('Failed to fetch blogs from Supabase, using static data', err);
-      const all = [...staticBlogs, ...demoBlogs];
-      const unique = Array.from(new Map(all.map(b => [b.title, b])).values());
-      console.log('[DEBUG] Setting from catch (static+demo), count:', unique.length, 'titles:', unique.map((b:any)=>b.title));
-      setBlogList(unique);
-    } finally {
-      setLoading(false);
-      console.log('[DEBUG] Final blogList length after merge:', blogList.length);
-    }
+    const all = await fetchBlogs();
+    setBlogList(all);
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchBlogs();
+    loadBlogs();
   }, []);
+
+  const categories = useMemo(
+    () => ['All', ...Array.from(new Set(blogList.map((b) => b.category).filter(Boolean)))],
+    [blogList]
+  );
+
+  const visibleBlogs = useMemo(
+    () => (category === 'All' ? blogList : blogList.filter((b) => b.category === category)),
+    [blogList, category]
+  );
 
   return (
     <div className="min-h-screen bg-[#f1f5f9] pt-16">
@@ -109,18 +44,7 @@ const BlogList = () => {
             <ArrowLeft className="w-4 h-4" /> Back to home
           </Link>
 
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <p className="text-[#0e7490] font-semibold text-sm tracking-widest uppercase">Insights &amp; Articles</p>
-            <button 
-              onClick={fetchBlogs} 
-              disabled={loading}
-              className="text-xs text-gray-500 hover:text-[#0e7490] underline disabled:opacity-50"
-              title="Refresh list to see latest added blogs"
-            >
-              {loading ? 'Refreshing...' : 'Refresh'}
-            </button>
-          </div>
-          <p className="text-[10px] text-gray-400 mb-2">DEBUG: Total in list: {blogList.length} | DB rows: {dbCount ?? '?'} | Demo local: {loadDemoBlogs().length}</p>
+          <p className="text-[#0e7490] font-semibold text-sm tracking-widest uppercase mb-3">Insights &amp; Articles</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-[#0f172a] mb-4">
             Blogs by Nisha
           </h1>
@@ -129,10 +53,38 @@ const BlogList = () => {
           </p>
         </div>
 
+        {/* Filter controls */}
+        <div className="max-w-6xl mx-auto mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <label htmlFor="category-filter" className="text-sm text-gray-500">Filter by topic</label>
+            <select
+              id="category-filter"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0e7490]"
+            >
+              {categories.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+          <button
+            onClick={loadBlogs}
+            disabled={loading}
+            className="text-xs text-gray-500 hover:text-[#0e7490] underline disabled:opacity-50"
+            title="Refresh list to see the latest articles"
+          >
+            {loading ? 'Refreshing...' : 'Refresh'}
+          </button>
+        </div>
+
         {/* Blog Grid - Full List */}
-        {loading && <div className="text-center py-8 text-gray-500">Loading blogs from backend...</div>}
+        {loading && <div className="text-center py-8 text-gray-500">Loading blogs...</div>}
+        {!loading && visibleBlogs.length === 0 && (
+          <p className="text-center text-gray-500 py-8">No articles found for this topic.</p>
+        )}
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {blogList.map((blog, index) => (
+          {visibleBlogs.map((blog, index) => (
             <article
               key={index}
               className="bg-white rounded-2xl border border-gray-200 overflow-hidden card-hover flex flex-col group cursor-pointer"

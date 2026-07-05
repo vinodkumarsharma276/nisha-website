@@ -24,20 +24,25 @@ create policy "Allow public read access"
   on public.blogs for select
   using (true);
 
--- Only signed-in Supabase Auth users can WRITE. The admin form signs in with
--- email/password, so inserts/updates/deletes carry an authenticated JWT.
--- The public anon key alone cannot write.
+-- Only the admin user can WRITE. Writes are locked to a specific Supabase Auth
+-- user id (auth.uid()), so even another signed-in user (or the public anon key)
+-- cannot insert/update/delete. Replace the UUID below if the admin user changes:
+--   select id, email from auth.users;
 drop policy if exists "Allow authenticated insert" on public.blogs;
-create policy "Allow authenticated insert"
+drop policy if exists "Allow admin insert" on public.blogs;
+create policy "Allow admin insert"
   on public.blogs for insert to authenticated
-  with check (true);
+  with check (auth.uid() = 'b71d27e8-76dc-4dc0-875b-aa889f417892'::uuid);
 
 drop policy if exists "Allow authenticated update" on public.blogs;
-create policy "Allow authenticated update"
+drop policy if exists "Allow admin update" on public.blogs;
+create policy "Allow admin update"
   on public.blogs for update to authenticated
-  using (true) with check (true);
+  using (auth.uid() = 'b71d27e8-76dc-4dc0-875b-aa889f417892'::uuid)
+  with check (auth.uid() = 'b71d27e8-76dc-4dc0-875b-aa889f417892'::uuid);
 
 drop policy if exists "Allow authenticated delete" on public.blogs;
-create policy "Allow authenticated delete"
+drop policy if exists "Allow admin delete" on public.blogs;
+create policy "Allow admin delete"
   on public.blogs for delete to authenticated
-  using (true);
+  using (auth.uid() = 'b71d27e8-76dc-4dc0-875b-aa889f417892'::uuid);
