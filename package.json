@@ -10,9 +10,7 @@
     "build:azure": "BUILD_TARGET=azure tsc -b && vite build",
     "build:gh": "BUILD_TARGET=gh tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "predeploy": "npm run build:gh",
-    "deploy": "gh-pages -d dist"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.0",
