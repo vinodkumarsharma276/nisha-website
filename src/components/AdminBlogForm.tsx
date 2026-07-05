@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import TipTapLink from '@tiptap/extension-link';
 import { supabase } from '../lib/supabase';
 import { categoryColors } from '../data/blogs';
 
@@ -13,14 +16,12 @@ interface BlogFormData {
   views: string;
 }
 
-const HARDCODED_USERNAME = 'admin'; // TODO: Change this
-const HARDCODED_PASSWORD = 'admin123'; // TODO: Change this
-const JWT_SECRET = 'your-super-secret-jwt-key-change-this'; // TODO: Change this in production
-
 const AdminBlogForm: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const [loginError, setLoginError] = useState('');
-  const [username, setUsername] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
@@ -33,63 +34,81 @@ const AdminBlogForm: React.FC = () => {
   });
   const [submitStatus, setSubmitStatus] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
-  // Simple JWT-like token creation (for demo - not cryptographically secure on client)
-  const createToken = (user: string): string => {
-    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-    const payload = btoa(JSON.stringify({
-      sub: user,
-      iat: Date.now(),
-      exp: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
-    }));
-    // In real app this would be signed on server. Here we simulate.
-    const signature = btoa(JWT_SECRET + payload);
-    return `${header}.${payload}.${signature}`;
-  };
+  // Rich text editor (TipTap)
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      TipTapLink.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-[#0e7490] underline hover:text-[#0f172a]',
+        },
+      }),
+    ],
+    content: formData.content || '<p></p>',
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      setFormData((prev) => ({ ...prev, content: html }));
+    },
+  });
 
-  const verifyToken = (token: string): boolean => {
-    try {
-      const parts = token.split('.');
-      if (parts.length !== 3) return false;
-
-      const payload = JSON.parse(atob(parts[1]));
-      if (payload.exp < Date.now()) {
-        localStorage.removeItem('admin_jwt_token');
-        return false;
-      }
-      // Basic signature check (demo only)
-      const expectedSig = btoa(JWT_SECRET + parts[1]);
-      return parts[2] === expectedSig;
-    } catch {
-      return false;
-    }
-  };
-
-  // Check for existing token on mount
+  // Sync editor when formData.content is reset from outside (e.g. after submit)
   useEffect(() => {
-    const token = localStorage.getItem('admin_jwt_token');
-    if (token && verifyToken(token)) {
-      setIsAuthenticated(true);
+    if (editor && formData.content !== editor.getHTML()) {
+      editor.commands.setContent(formData.content || '<p></p>');
     }
+  }, [formData.content, editor]);
+
+  // Check for an existing Supabase auth session on mount + subscribe to changes
+  useEffect(() => {
+    if (!supabase) {
+      setAuthChecked(true);
+      return;
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      setIsAuthenticated(!!data.session);
+      setAuthChecked(true);
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
 
-    if (username === HARDCODED_USERNAME && password === HARDCODED_PASSWORD) {
-      const token = createToken(username);
-      localStorage.setItem('admin_jwt_token', token);
-      setIsAuthenticated(true);
-      setUsername('');
-      setPassword('');
-    } else {
-      setLoginError('Invalid username or password');
+    if (!supabase) {
+      setLoginError('Blog backend is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
+      return;
     }
+
+    setIsLoggingIn(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setIsLoggingIn(false);
+
+    if (error) {
+      setLoginError(error.message || 'Invalid email or password');
+      return;
+    }
+
+    setIsAuthenticated(true);
+    setEmail('');
+    setPassword('');
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin_jwt_token');
+  const handleLogout = async () => {
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
     setIsAuthenticated(false);
     setFormData({
       title: '',
@@ -112,8 +131,15 @@ const AdminBlogForm: React.FC = () => {
     setSubmitStatus('');
     setIsSubmitting(true);
 
-    const token = localStorage.getItem('admin_jwt_token');
-    if (!token || !verifyToken(token)) {
+    if (!supabase) {
+      setSubmitStatus('Error: Blog backend is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Ensure we still have a valid Supabase session (JWT) before writing
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData.session) {
       setSubmitStatus('Session expired. Please log in again.');
       setIsAuthenticated(false);
       setIsSubmitting(false);
@@ -132,20 +158,14 @@ const AdminBlogForm: React.FC = () => {
         views: formData.views,
       };
 
-      if (supabase) {
-        const { error } = await supabase
-          .from('blogs')
-          .insert([blogToInsert]);
+      const { error } = await supabase
+        .from('blogs')
+        .insert([blogToInsert]);
 
-        if (error) {
-          throw error;
-        }
-        setSubmitStatus('Blog added successfully to Supabase! It should appear on the /blog page shortly.');
-      } else {
-        // Fallback: just show what would be added (for demo without Supabase)
-        console.log('Would insert to Supabase:', blogToInsert);
-        setSubmitStatus('Blog "added" (demo mode - Supabase not configured). Check console.');
+      if (error) {
+        throw error;
       }
+      setSubmitStatus('Blog added successfully! Taking you to the blog list...');
 
       // Reset form
       setFormData({
@@ -158,7 +178,10 @@ const AdminBlogForm: React.FC = () => {
         views: '0',
       });
 
-      // Success - no auto navigate since View link removed
+      // Auto navigate to blog list so the new blog is visible immediately
+      setTimeout(() => {
+        navigate('/blog');
+      }, 1200);
 
     } catch (error: any) {
       console.error('Error adding blog:', error);
@@ -168,20 +191,36 @@ const AdminBlogForm: React.FC = () => {
     }
   };
 
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-[#f1f5f9] pt-16 flex items-center justify-center">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-[#f1f5f9] pt-16 flex items-center justify-center">
         <div className="bg-white p-8 rounded-xl shadow max-w-md w-full">
           <h1 className="text-2xl font-bold text-[#0f172a] mb-6 text-center">Admin Login</h1>
-          
+
+          {!supabase && (
+            <p className="mb-4 p-3 rounded-lg bg-amber-50 text-amber-700 text-sm">
+              Blog backend is not configured. Set <code>VITE_SUPABASE_URL</code> and{' '}
+              <code>VITE_SUPABASE_ANON_KEY</code> to enable login.
+            </p>
+          )}
+
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
               <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e7490]"
+                autoComplete="email"
                 required
               />
             </div>
@@ -192,23 +231,25 @@ const AdminBlogForm: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e7490]"
+                autoComplete="current-password"
                 required
               />
             </div>
             {loginError && <p className="text-red-600 text-sm">{loginError}</p>}
             <button
               type="submit"
-              className="w-full bg-[#0e7490] text-white py-3 rounded-lg font-medium hover:bg-[#0e7490] transition"
+              disabled={isLoggingIn || !supabase}
+              className="w-full bg-[#0e7490] text-white py-3 rounded-lg font-medium hover:bg-[#0e7490] transition disabled:opacity-60"
             >
-              Login
+              {isLoggingIn ? 'Signing in...' : 'Login'}
             </button>
           </form>
 
           <p className="text-xs text-gray-500 mt-4 text-center">
-            Default: admin / admin123 (change in code)
+            Sign in with your Supabase admin account.
           </p>
           <div className="mt-4 text-center">
-            <Link to="/" className="text-sm text-[#0e7490] hover:underline">Back to site</Link>
+            <RouterLink to="/" className="text-sm text-[#0e7490] hover:underline">Back to site</RouterLink>
           </div>
         </div>
       </div>
@@ -258,14 +299,96 @@ const AdminBlogForm: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Full Content *</label>
-                <textarea
-                  name="content"
-                  value={formData.content}
-                  onChange={handleInputChange}
-                  rows={12}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-[#0e7490]"
-                  required
-                />
+                <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
+                  {/* Rich Text Toolbar */}
+                  <div className="flex flex-wrap gap-1 p-2 border-b bg-gray-50 text-sm">
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleBold().run()}
+                      className={`px-2 py-1 rounded hover:bg-gray-200 ${editor?.isActive('bold') ? 'bg-gray-200 font-bold' : ''}`}
+                      title="Bold"
+                    >
+                      B
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleItalic().run()}
+                      className={`px-2 py-1 rounded hover:bg-gray-200 italic ${editor?.isActive('italic') ? 'bg-gray-200' : ''}`}
+                      title="Italic"
+                    >
+                      I
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+                      className={`px-2 py-1 rounded hover:bg-gray-200 ${editor?.isActive('heading', { level: 2 }) ? 'bg-gray-200 font-semibold' : ''}`}
+                      title="Heading 2"
+                    >
+                      H2
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
+                      className={`px-2 py-1 rounded hover:bg-gray-200 ${editor?.isActive('heading', { level: 3 }) ? 'bg-gray-200 font-semibold' : ''}`}
+                      title="Heading 3"
+                    >
+                      H3
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleBulletList().run()}
+                      className={`px-2 py-1 rounded hover:bg-gray-200 ${editor?.isActive('bulletList') ? 'bg-gray-200' : ''}`}
+                      title="Bullet List"
+                    >
+                      • List
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+                      className={`px-2 py-1 rounded hover:bg-gray-200 ${editor?.isActive('orderedList') ? 'bg-gray-200' : ''}`}
+                      title="Numbered List"
+                    >
+                      1. List
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().setHorizontalRule().run()}
+                      className="px-2 py-1 rounded hover:bg-gray-200"
+                      title="Horizontal Rule"
+                    >
+                      —
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const url = window.prompt('Enter URL');
+                        if (url) {
+                          editor?.chain().focus().setLink({ href: url }).run();
+                        }
+                      }}
+                      className={`px-2 py-1 rounded hover:bg-gray-200 ${editor?.isActive('link') ? 'bg-gray-200' : ''}`}
+                      title="Add Link"
+                    >
+                      🔗
+                    </button>
+                    {editor?.isActive('link') && (
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().unsetLink().run()}
+                        className="px-2 py-1 rounded hover:bg-gray-200 text-red-600"
+                        title="Remove Link"
+                      >
+                        ✕ Link
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Editor */}
+                  <div className="p-4 min-h-[220px] prose prose-sm max-w-none focus-within:outline-none">
+                    <EditorContent editor={editor} />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Supports bold, italic, headings, lists, etc.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -331,12 +454,17 @@ const AdminBlogForm: React.FC = () => {
               {submitStatus && (
                 <div className={`p-4 rounded-lg text-sm ${submitStatus.includes('Error') ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
                   {submitStatus}
+                  {!submitStatus.includes('Error') && (
+                    <div className="mt-2">
+                      <a href="/#/blog" className="underline hover:no-underline" onClick={() => { window.location.href = '/#/blog'; window.location.reload(); }}>Go to blog page (click to refresh & see your new blog)</a>
+                    </div>
+                  )}
                 </div>
               )}
             </form>
 
             <p className="text-xs text-gray-500 mt-6 text-center">
-              Authenticated via JWT (stored in localStorage). This is a protected admin area.
+              Authenticated via Supabase Auth. This is a protected admin area.
             </p>
           </div>
         </div>
@@ -358,16 +486,17 @@ const AdminBlogForm: React.FC = () => {
               </div>
 
               {/* Title */}
-              <h1 className="text-3xl lg:text-4xl font-bold text-[#0e7490] mb-6 leading-tight">
+              <h1 className="text-3xl lg:text-4xl font-bold text-[#0f172a] mb-6 leading-tight">
                 {formData.title || 'Your Blog Title Will Appear Here'}
               </h1>
 
-              {/* Content preview */}
-              <div className="text-gray-700 leading-relaxed text-[15px]">
-                {(formData.content || 'Start typing in the form on the left to see a live preview of the blog content here. Use line breaks for paragraphs.').split('\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4">{paragraph}</p>
-                ))}
-              </div>
+              {/* Content preview - rendered as rich HTML */}
+              <div 
+                className="text-gray-700 leading-relaxed text-[15px] prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ 
+                  __html: formData.content || '<p>Start typing in the form on the left to see a live preview of the blog content here.</p>' 
+                }} 
+              />
             </div>
 
             <p className="text-[10px] text-gray-400 mt-3 text-center">

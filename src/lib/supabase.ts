@@ -21,7 +21,12 @@ CREATE TABLE IF NOT EXISTS blogs (
 ALTER TABLE blogs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read access" ON blogs FOR SELECT USING (true);
 
--- For writing: Use Supabase dashboard (Table Editor) or add auth later.
+-- Allow only signed-in (Supabase Auth) users to write. The admin form signs in
+-- with email/password, so writes carry an authenticated JWT. The public anon key
+-- alone cannot insert/update/delete.
+CREATE POLICY "Allow authenticated insert" ON blogs FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Allow authenticated update" ON blogs FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated delete" ON blogs FOR DELETE TO authenticated USING (true);
 */
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL

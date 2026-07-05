@@ -126,9 +126,7 @@ const Blogs = () => {
                   {selectedBlog.title}
                 </h3>
                 <div className="text-gray-600 leading-relaxed text-base">
-                  {selectedBlog.content.split('\n').map((paragraph, index) => (
-                    <p key={index} className="mb-4">{paragraph}</p>
-                  ))}
+                  <div dangerouslySetInnerHTML={{ __html: selectedBlog.content }} />
                 </div>
               </div>
             </div>

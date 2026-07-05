@@ -4,43 +4,96 @@ import { Link } from 'react-router-dom';
 import { supabase, type Blog } from '../lib/supabase';
 import { blogs as staticBlogs, categoryColors } from '../data/blogs';
 
+function loadDemoBlogs(): Blog[] {
+  try {
+    return JSON.parse(localStorage.getItem('added_blogs') || '[]');
+  } catch {
+    return [];
+  }
+}
+
 const BlogList = () => {
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
   const [blogList, setBlogList] = useState<Blog[]>(staticBlogs);
   const [loading, setLoading] = useState(false);
+  const [dbCount, setDbCount] = useState<number | null>(null);
+
+  const fetchBlogs = async () => {
+    const demoBlogs = loadDemoBlogs().map((b: any) => ({
+      ...b,
+      readTime: b.readTime || b.read_time || '5 min read',
+    })) as Blog[];
+    console.log('[DEBUG] Demo blogs from localStorage:', demoBlogs.length, demoBlogs.map(b => b.title));
+
+    if (!supabase) {
+      // Demo mode: merge static + locally added blogs
+      const all = [...staticBlogs, ...demoBlogs];
+      const unique = Array.from(new Map(all.map(b => [b.title, b])).values());
+      console.log('[DEBUG] No supabase client, using static+demo, count:', unique.length, 'titles:', unique.map((b:any)=>b.title));
+      setBlogList(unique);
+      return;
+    }
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('blogs')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      const count = data ? data.length : 0;
+      console.log('[DEBUG] Supabase DB query returned:', count, 'rows');
+      console.log('[DEBUG] DB blog titles:', data ? data.map((b: any) => b.title) : []);
+      setDbCount(count);
+      if (data && data.length > 0) {
+        console.log('[DEBUG] DB blog titles:', data.map((b: any) => b.title));
+        // Assume DB uses camelCase or adjust here. Map if your columns use snake_case.
+        let mapped = (data as any[]).map((b) => ({
+          ...b,
+          readTime: b.readTime || b.read_time || '5 min read',
+        })) as Blog[];
+
+        // Ensure newest first by created_at if available
+        mapped = mapped.sort((a: any, b: any) => {
+          if (a.created_at && b.created_at) {
+            return b.created_at.localeCompare(a.created_at);
+          }
+          return 0;
+        });
+
+        // Merge DB + demo + static. Prefer DB/demo over static for same title.
+        const all = [...staticBlogs, ...demoBlogs, ...mapped];
+        const unique = Array.from(new Map(all.map(b => [b.title, b])).values());
+        // Sort: ones with created_at first (newest), then others
+        const sortedUnique = unique.sort((a: any, b: any) => {
+          if (a.created_at && b.created_at) return b.created_at.localeCompare(a.created_at);
+          if (a.created_at) return -1;
+          if (b.created_at) return 1;
+          return 0;
+        });
+        console.log('[DEBUG] Setting from DB+demo+static, count:', sortedUnique.length, 'titles:', sortedUnique.map((b:any)=>b.title));
+        setBlogList(sortedUnique);
+      } else {
+        // No DB data: merge static + demo
+        const all = [...staticBlogs, ...demoBlogs];
+        const unique = Array.from(new Map(all.map(b => [b.title, b])).values());
+        console.log('[DEBUG] Setting from static+demo (no DB data), count:', unique.length, 'titles:', unique.map((b:any)=>b.title));
+        setBlogList(unique);
+      }
+    } catch (err) {
+      console.error('Failed to fetch blogs from Supabase, using static data', err);
+      const all = [...staticBlogs, ...demoBlogs];
+      const unique = Array.from(new Map(all.map(b => [b.title, b])).values());
+      console.log('[DEBUG] Setting from catch (static+demo), count:', unique.length, 'titles:', unique.map((b:any)=>b.title));
+      setBlogList(unique);
+    } finally {
+      setLoading(false);
+      console.log('[DEBUG] Final blogList length after merge:', blogList.length);
+    }
+  };
 
   useEffect(() => {
-    const fetchBlogs = async () => {
-      if (!supabase) {
-        setBlogList(staticBlogs as Blog[]);
-        return;
-      }
-      setLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('blogs')
-          .select('*')
-          .order('date', { ascending: false });
-        
-        if (error) throw error;
-        
-        if (data && data.length > 0) {
-          // Assume DB uses camelCase or adjust here. Map if your columns use snake_case.
-          const mapped = (data as any[]).map((b) => ({
-            ...b,
-            readTime: b.readTime || b.read_time || '5 min read',
-          })) as Blog[];
-          setBlogList(mapped);
-        } else {
-          setBlogList(staticBlogs);
-        }
-      } catch (err) {
-        console.error('Failed to fetch blogs from Supabase, using static data', err);
-        setBlogList(staticBlogs as Blog[]);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchBlogs();
   }, []);
 
@@ -56,7 +109,18 @@ const BlogList = () => {
             <ArrowLeft className="w-4 h-4" /> Back to home
           </Link>
 
-          <p className="text-[#0e7490] font-semibold text-sm tracking-widest uppercase mb-3">Insights &amp; Articles</p>
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <p className="text-[#0e7490] font-semibold text-sm tracking-widest uppercase">Insights &amp; Articles</p>
+            <button 
+              onClick={fetchBlogs} 
+              disabled={loading}
+              className="text-xs text-gray-500 hover:text-[#0e7490] underline disabled:opacity-50"
+              title="Refresh list to see latest added blogs"
+            >
+              {loading ? 'Refreshing...' : 'Refresh'}
+            </button>
+          </div>
+          <p className="text-[10px] text-gray-400 mb-2">DEBUG: Total in list: {blogList.length} | DB rows: {dbCount ?? '?'} | Demo local: {loadDemoBlogs().length}</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-[#0f172a] mb-4">
             Blogs by Nisha
           </h1>
@@ -138,11 +202,10 @@ const BlogList = () => {
               <h3 className="text-2xl lg:text-3xl font-bold text-[#0f172a] mb-6">
                 {selectedBlog.title}
               </h3>
-              <div className="text-gray-600 leading-relaxed text-base prose">
-                {selectedBlog.content.split('\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4">{paragraph}</p>
-                ))}
-              </div>
+              <div 
+                className="text-gray-600 leading-relaxed text-base prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: selectedBlog.content }} 
+              />
             </div>
           </div>
         </div>
