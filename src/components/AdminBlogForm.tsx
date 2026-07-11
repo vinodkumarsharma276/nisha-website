@@ -40,6 +40,7 @@ const AdminBlogForm: React.FC = () => {
 
   // Rich text editor (TipTap)
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit,
       TipTapLink.configure({
@@ -56,10 +57,17 @@ const AdminBlogForm: React.FC = () => {
     },
   });
 
-  // Sync editor when formData.content is reset from outside (e.g. after submit)
+  // Sync editor when formData.content is reset from outside (e.g. after submit).
+  // Guard against the editor not being ready yet / destroyed (e.g. on route change),
+  // where getHTML() would throw because the schema/view isn't initialized.
   useEffect(() => {
-    if (editor && formData.content !== editor.getHTML()) {
-      editor.commands.setContent(formData.content || '<p></p>');
+    if (!editor || editor.isDestroyed) return;
+    try {
+      if (formData.content !== editor.getHTML()) {
+        editor.commands.setContent(formData.content || '<p></p>');
+      }
+    } catch {
+      // Editor view not ready yet; the initial `content` config already applies.
     }
   }, [formData.content, editor]);
 
@@ -351,6 +359,7 @@ const AdminBlogForm: React.FC = () => {
               >
                 + Add New Blog
               </button>
+              <RouterLink to="/meadminmessages" className="text-sm text-[#0e7490] hover:underline">Messages</RouterLink>
               <button onClick={handleLogout} className="text-sm text-red-600 hover:underline">Logout</button>
             </div>
           </div>

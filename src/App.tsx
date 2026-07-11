@@ -11,6 +11,7 @@ import Footer from './components/Footer';
 import BlogList from './components/BlogList';
 import BlogTeaser from './components/BlogTeaser';
 import AdminBlogForm from './components/AdminBlogForm';
+import AdminMessages from './components/AdminMessages';
 
 function MainContent() {
   return (
@@ -38,6 +39,7 @@ function App() {
         <Route path="/" element={<MainContent />} />
         <Route path="/blog" element={<BlogList />} />
         <Route path="/meadminblogs" element={<AdminBlogForm />} />
+        <Route path="/meadminmessages" element={<AdminMessages />} />
       </Routes>
       <Footer />
     </div>

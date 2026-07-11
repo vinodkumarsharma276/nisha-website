@@ -56,28 +56,37 @@ create table if not exists public.contact_messages (
   email      text not null,
   subject    text not null,
   message    text not null,
+  status     text not null default 'new'
+             check (status in ('new', 'in_progress', 'resolved', 'archived')),
   created_at timestamptz default now()
 );
 
 alter table public.contact_messages enable row level security;
 
--- Anyone (public anon key) can SUBMIT a message, with basic length limits to curb abuse.
+-- Anyone (public anon key) can SUBMIT a message (as 'new'), with basic length limits to curb abuse.
 drop policy if exists "Anyone can submit a contact message" on public.contact_messages;
 create policy "Anyone can submit a contact message"
   on public.contact_messages for insert
   to anon, authenticated
   with check (
+    status = 'new' and
     char_length(name) between 1 and 200 and
     char_length(email) between 3 and 320 and
     char_length(subject) between 1 and 300 and
     char_length(message) between 1 and 5000
   );
 
--- Only the admin user can READ / DELETE messages.
+-- Only the admin user can READ / UPDATE (change status) / DELETE messages.
 drop policy if exists "Admin can read contact messages" on public.contact_messages;
 create policy "Admin can read contact messages"
   on public.contact_messages for select to authenticated
   using (auth.uid() = 'b71d27e8-76dc-4dc0-875b-aa889f417892'::uuid);
+
+drop policy if exists "Admin can update contact messages" on public.contact_messages;
+create policy "Admin can update contact messages"
+  on public.contact_messages for update to authenticated
+  using (auth.uid() = 'b71d27e8-76dc-4dc0-875b-aa889f417892'::uuid)
+  with check (auth.uid() = 'b71d27e8-76dc-4dc0-875b-aa889f417892'::uuid);
 
 drop policy if exists "Admin can delete contact messages" on public.contact_messages;
 create policy "Admin can delete contact messages"
