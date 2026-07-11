@@ -1,5 +1,6 @@
 import { Send, Mail, MapPin, Clock, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
+import { supabase } from '../lib/supabase';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -8,15 +9,45 @@ const Contact = () => {
     subject: '',
     message: ''
   });
+  const [company, setCompany] = useState(''); // honeypot (real users never see/fill this)
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
-    setTimeout(() => {
-      setIsSubmitted(false);
+    setError('');
+
+    // Honeypot: if this hidden field is filled, it's almost certainly a bot.
+    // Silently show success without storing anything.
+    if (company.trim() !== '') {
+      setIsSubmitted(true);
       setFormData({ name: '', email: '', subject: '', message: '' });
-    }, 3000);
+      return;
+    }
+
+    if (!supabase) {
+      setError('Sorry, the contact form is temporarily unavailable. Please email nishashrm75@gmail.com directly.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    const { error: submitError } = await supabase.from('contact_messages').insert([{
+      name: formData.name,
+      email: formData.email,
+      subject: formData.subject,
+      message: formData.message,
+    }]);
+    setIsSubmitting(false);
+
+    if (submitError) {
+      console.error('Contact form submit failed:', submitError);
+      setError('Something went wrong sending your message. Please try again, or email nishashrm75@gmail.com directly.');
+      return;
+    }
+
+    setIsSubmitted(true);
+    setFormData({ name: '', email: '', subject: '', message: '' });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -50,6 +81,17 @@ const Contact = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Honeypot field - hidden from humans; bots that fill it are ignored */}
+                <input
+                  type="text"
+                  name="company"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="hidden"
+                />
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
@@ -107,12 +149,15 @@ const Contact = () => {
                   ></textarea>
                 </div>
 
+                {error && <p className="text-red-600 text-sm">{error}</p>}
+
                 <button
                   type="submit"
-                  className="w-full bg-[#0f172a] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#1e293b] transition-colors flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="w-full bg-[#0f172a] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#1e293b] transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
                 >
                   <Send className="w-4 h-4" />
-                  Send Message
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
                 </button>
               </form>
             )}
