@@ -1,54 +1,121 @@
-import { Quote } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import Reveal from './ui/Reveal';
+import { useMotionTier } from '../lib/motion';
 
 const testimonials = [
   {
-    quote: "Nisha handled my ITR and GST filings perfectly. She explained everything clearly and helped me claim deductions I didn't know about. Saved me both time and money.",
-    name: "Rohit Mehra",
-    role: "Freelance Designer, Delhi",
-    result: "₹38k extra refund",
+    quote:
+      "Nisha handled my ITR and GST filings perfectly. She explained everything clearly and helped me claim deductions I didn't know about. Saved me both time and money.",
+    name: 'Rohit Mehra',
+    role: 'Freelance Designer, Delhi',
+    result: '₹38k extra refund',
   },
   {
-    quote: "As a small business owner, GST compliance used to stress me out. Nisha set up proper processes and now everything is on autopilot. Highly professional and responsive.",
-    name: "Priya Sharma",
-    role: "Founder, Studio Kala",
-    result: "Zero notices in 18 months",
+    quote:
+      'As a small business owner, GST compliance used to stress me out. Nisha set up proper processes and now everything is on autopilot. Highly professional and responsive.',
+    name: 'Priya Sharma',
+    role: 'Founder, Studio Kala',
+    result: 'Zero notices in 18 months',
   },
   {
-    quote: "Nisha supported our company registration and ongoing tax filings. Her attention to detail is exceptional. We now use her for all compliance needs.",
-    name: "Ankit & Meera",
-    role: "Co-founders, Tech Startup",
-    result: "On-time every quarter",
+    quote:
+      'Nisha supported our company registration and ongoing tax filings. Her attention to detail is exceptional. We now use her for all compliance needs.',
+    name: 'Ankit & Meera',
+    role: 'Co-founders, Tech Startup',
+    result: 'On time, every quarter',
   },
 ];
 
+const initials = (name: string) =>
+  name
+    .split(/\s|&/)
+    .filter(Boolean)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('');
+
 const Testimonials = () => {
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const tier = useMotionTier();
+
+  // Auto-advance only when motion is allowed and the user isn't interacting.
+  useEffect(() => {
+    if (tier === 'none' || paused) return;
+    const id = setInterval(() => setIndex((i) => (i + 1) % testimonials.length), 7000);
+    return () => clearInterval(id);
+  }, [tier, paused]);
+
+  const go = (d: number) => setIndex((i) => (i + d + testimonials.length) % testimonials.length);
+
   return (
-    <section className="py-16 lg:py-20 bg-[#f1f5f9]">
-      <div className="container mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <p className="text-[#0e7490] font-semibold text-sm tracking-widest uppercase mb-3">Real People. Real Results.</p>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0f172a] mb-3">What Clients Say</h2>
-          <p className="text-gray-600 max-w-lg mx-auto">Trusted by individuals and businesses for accurate, timely, and stress-free financial compliance.</p>
+    <section aria-label="Client testimonials" className="bg-paper py-24 lg:py-32 overflow-hidden">
+      <div className="max-w-6xl mx-auto px-5 sm:px-8">
+        <Reveal>
+          <p className="eyebrow justify-center mb-10">Kind words from clients</p>
+        </Reveal>
+
+        <div
+          className="relative grid"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          onFocus={() => setPaused(true)}
+          onBlur={() => setPaused(false)}
+        >
+          {testimonials.map((t, i) => {
+            const active = i === index;
+            return (
+              <figure
+                key={t.name}
+                data-active={active}
+                aria-hidden={!active}
+                className={`quote-slide [grid-area:1/1] text-center ${active ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+              >
+                <span className="block font-display text-[120px] leading-[0.6] text-accent/25 select-none" aria-hidden>
+                  “
+                </span>
+                <blockquote className="font-display text-[26px] sm:text-[38px] lg:text-[46px] leading-[1.2] tracking-[-0.015em] text-ink max-w-5xl mx-auto">
+                  {t.quote}
+                </blockquote>
+                <figcaption className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+                  <span className="flex items-center gap-3">
+                    <span className="w-12 h-12 rounded-full bg-ink text-paper flex items-center justify-center font-display text-lg">
+                      {initials(t.name)}
+                    </span>
+                    <span className="text-left">
+                      <span className="block font-semibold text-ink">{t.name}</span>
+                      <span className="block text-sm text-ink-soft">{t.role}</span>
+                    </span>
+                  </span>
+                  <span className="hidden sm:block w-px h-10 bg-line" />
+                  <span className="rounded-full bg-accent-soft text-accent text-sm font-semibold px-4 py-2">{t.result}</span>
+                </figcaption>
+              </figure>
+            );
+          })}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
-          {testimonials.map((t, i) => (
-            <div key={i} className="bg-white border border-gray-100 rounded-2xl p-6 lg:p-7 flex flex-col shadow-sm hover:shadow-md transition-shadow">
-              <Quote className="w-6 h-6 text-[#0e7490] mb-4" />
-              <p className="text-[15px] text-gray-700 leading-relaxed flex-1 mb-6">“{t.quote}”</p>
-              
-              <div className="border-t pt-4 flex justify-between items-end">
-                <div>
-                  <div className="font-semibold text-[#0f172a]">{t.name}</div>
-                  <div className="text-xs text-gray-500">{t.role}</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-xs uppercase tracking-wider text-[#0e7490] font-medium">Result</div>
-                  <div className="text-sm font-semibold text-[#0f172a]">{t.result}</div>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="mt-12 flex items-center justify-center gap-5">
+          <button onClick={() => go(-1)} aria-label="Previous testimonial" className="w-11 h-11 rounded-full border border-ink/20 flex items-center justify-center text-ink hover:bg-ink hover:text-paper transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <div className="flex gap-2">
+            {testimonials.map((t, i) => (
+              <button
+                key={t.name}
+                onClick={() => setIndex(i)}
+                aria-label={`Show testimonial ${i + 1}`}
+                aria-current={i === index}
+                className="h-11 flex items-center"
+              >
+                <span className={`block h-1.5 rounded-full transition-all duration-500 ${i === index ? 'w-10 bg-ink' : 'w-4 bg-ink/20 hover:bg-ink/40'}`} />
+              </button>
+            ))}
+          </div>
+          <button onClick={() => go(1)} aria-label="Next testimonial" className="w-11 h-11 rounded-full border border-ink/20 flex items-center justify-center text-ink hover:bg-ink hover:text-paper transition-colors">
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </section>

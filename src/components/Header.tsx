@@ -1,41 +1,60 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Linkedin, Twitter, Menu, X, Youtube } from 'lucide-react';
+import { Linkedin, Twitter, Menu, X, Youtube, ArrowUpRight } from 'lucide-react';
 
 const scrollNavLinks = [
-  { label: 'Home', id: 'home' },
+  { label: 'About', id: 'about' },
   { label: 'Services', id: 'services' },
-  { label: 'Background', id: 'experience' },
+  { label: 'Process', id: 'process' },
   { label: 'Contact', id: 'contact' },
 ];
 
-const blogLink = { label: 'Blog', to: '/blog' };
+const socials = [
+  { href: 'https://www.linkedin.com/in/-nisha-sharma/', label: 'LinkedIn', icon: Linkedin },
+  { href: 'https://x.com/nishashrm75', label: 'X', icon: Twitter },
+  { href: 'https://youtube.com/@finsightswithnisha', label: 'YouTube', icon: Youtube },
+];
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('home');
+  const [activeSection, setActiveSection] = useState('');
+  const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isBlogActive = location.pathname === '/blog';
+  const isHome = location.pathname === '/';
+  const isBlogActive = location.pathname.startsWith('/blog');
 
-  // Scroll-spy: highlight the nav tab for the section currently in view (home route only)
+  // Solid background after leaving the top; hide while scrolling down, reveal on scroll up.
   useEffect(() => {
-    if (location.pathname !== '/') {
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 12);
+      setHidden(y > 400 && y > lastY.current + 4);
+      if (y < lastY.current - 4 || y <= 400) setHidden(false);
+      lastY.current = y;
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Scroll-spy on the home route
+  useEffect(() => {
+    if (!isHome) {
       setActiveSection('');
       return;
     }
     const ids = scrollNavLinks.map((l) => l.id);
     const handler = () => {
-      const offset = 90;
-      let current = ids[0];
+      let current = '';
       for (const id of ids) {
         const el = document.getElementById(id);
-        if (el && el.getBoundingClientRect().top <= offset) current = id;
+        if (el && el.getBoundingClientRect().top <= 120) current = id;
       }
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 4) {
-        current = ids[ids.length - 1];
-      }
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 4) current = 'contact';
       setActiveSection(current);
     };
     handler();
@@ -45,161 +64,135 @@ const Header = () => {
       window.removeEventListener('scroll', handler);
       window.removeEventListener('resize', handler);
     };
-  }, [location.pathname]);
+  }, [isHome]);
+
+  // Lock body scroll while the mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
 
   const scrollToSection = (id: string) => {
     setIsMobileMenuOpen(false);
-
-    if (location.pathname !== '/') {
-      // Navigate to home then scroll after render
+    if (!isHome) {
       navigate('/');
-      // Small delay to allow route change
-      setTimeout(() => {
-        const element = document.getElementById(id);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
+      setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 100);
       return;
     }
-
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const goToBlog = () => {
-    setIsMobileMenuOpen(false);
-  };
+  const solid = scrolled || !isHome || isMobileMenuOpen;
 
   return (
-    <header className="bg-white border-b border-gray-200 fixed w-full z-50">
-      <div className="container mx-auto px-4 sm:px-6 flex justify-between items-center h-16">
-        {/* Logo */}
-        <Link to="/" className="flex items-center space-x-2">
-          <div className="w-9 h-9 bg-[#0f172a] rounded flex items-center justify-center">
-            <span className="text-white font-bold text-sm">N</span>
-          </div>
-          <span className="text-lg font-semibold text-[#0f172a]">Nisha</span>
+    <header
+      className={`site-header fixed top-0 inset-x-0 z-50 border-b ${
+        solid ? 'bg-paper/85 backdrop-blur-xl border-line shadow-[0_8px_30px_-20px_rgba(11,31,51,0.25)]' : 'bg-transparent border-transparent'
+      } ${hidden && !isMobileMenuOpen ? '-translate-y-full !shadow-none' : 'translate-y-0'}`}
+    >
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 flex justify-between items-center h-[72px]">
+        {/* Wordmark */}
+        <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-3 group" aria-label="Nisha Sharma — home">
+          <span className="relative w-10 h-10 rounded-full bg-ink text-paper flex items-center justify-center font-display text-lg font-bold transition-transform duration-500 group-hover:rotate-[-8deg]">
+            N
+          </span>
+          <span className="leading-tight">
+            <span className="block font-display text-[19px] text-ink">Nisha Sharma</span>
+            <span className="block text-[10.5px] tracking-[0.2em] uppercase text-ink-soft">Tax · GST · Compliance</span>
+          </span>
         </Link>
 
-        {/* Desktop Nav - Animated tabs */}
-        <nav className="hidden lg:flex items-center space-x-8">
+        {/* Desktop nav */}
+        <nav className="hidden lg:flex items-center gap-9" aria-label="Primary">
           {scrollNavLinks.map((link) => {
-            const active = location.pathname === '/' && activeSection === link.id;
+            const active = isHome && activeSection === link.id;
             return (
               <button
                 key={link.id}
                 onClick={() => scrollToSection(link.id)}
-                className={`nav-tab text-sm font-medium transition-all duration-200 hover:-translate-y-px active:scale-[0.985] ${
-                  active ? 'nav-tab-active text-[#0f172a] font-semibold' : 'text-gray-600 hover:text-[#0f172a]'
-                }`}
+                className={`nav-tab text-[14.5px] font-medium ${active ? 'nav-tab-active text-ink' : 'text-ink-soft hover:text-ink'}`}
               >
                 {link.label}
               </button>
             );
           })}
-
-          {/* Blog tab - React Router + active state (pure client navigation) */}
-          <button
-            onClick={() => {
-              navigate(blogLink.to);
-              goToBlog();
-            }}
-            className={`nav-tab text-sm font-medium transition-all duration-200 hover:-translate-y-px active:scale-[0.985] ${
-              isBlogActive
-                ? 'nav-tab-active text-[#0f172a] font-semibold'
-                : 'text-gray-600 hover:text-[#0f172a]'
-            }`}
+          <Link
+            to="/blog"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-current={isBlogActive ? 'page' : undefined}
+            className={`nav-tab text-[14.5px] font-medium ${isBlogActive ? 'text-ink' : 'text-ink-soft hover:text-ink'}`}
           >
-            {blogLink.label}
-          </button>
+            Blog
+          </Link>
         </nav>
 
-        {/* Right Section - Desktop */}
-        <div className="hidden lg:flex items-center gap-4">
-          <Link
-            to="/#contact"
-            onClick={() => scrollToSection('contact')}
-            className="px-5 py-2 bg-[#0f172a] text-white text-sm font-semibold rounded-lg hover:bg-[#0f172a] transition-all shadow-sm hover:shadow-md"
-          >
-            Book Consultation
-          </Link>
-
-          <div className="flex items-center gap-3 pl-2 border-l border-gray-200">
-            <a href="https://www.linkedin.com/in/-nisha-sharma/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#0f172a] transition-colors" aria-label="LinkedIn">
-              <Linkedin size={17} />
-            </a>
-            <a href="https://x.com/nishashrm75" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#0f172a] transition-colors" aria-label="X">
-              <Twitter size={17} />
-            </a>
-            <a href="https://youtube.com/@finsightswithnisha" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#0f172a] transition-colors" aria-label="YouTube">
-              <Youtube size={17} />
-            </a>
-            <a href="https://medium.com/@nishashrm75" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#0f172a] transition-colors font-bold text-[13px] leading-none" title="Medium" aria-label="Medium">
-              M
-            </a>
+        <div className="hidden lg:flex items-center gap-5">
+          <div className="flex items-center gap-3.5">
+            {socials.map(({ href, label, icon: Icon }) => (
+              <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="text-ink-soft/70 hover:text-ink transition-colors">
+                <Icon size={16} />
+              </a>
+            ))}
           </div>
+          <button onClick={() => scrollToSection('contact')} className="btn-primary py-2.5 px-5 text-sm">
+            Book a consultation
+            <ArrowUpRight className="arrow w-4 h-4" />
+          </button>
         </div>
 
-        {/* Mobile Toggle */}
+        {/* Mobile toggle */}
         <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="lg:hidden p-2 text-gray-600"
+          onClick={() => setIsMobileMenuOpen((o) => !o)}
+          className="lg:hidden w-11 h-11 -mr-2 flex items-center justify-center text-ink"
+          aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isMobileMenuOpen}
         >
-          {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-gray-100 py-4 px-6">
-          <nav className="flex flex-col space-y-1">
-            {scrollNavLinks.map((link) => {
-              const active = location.pathname === '/' && activeSection === link.id;
-              return (
-                <button
-                  key={link.id}
-                  onClick={() => scrollToSection(link.id)}
-                  className={`text-left font-medium py-2.5 ${active ? 'text-[#0e7490] font-semibold' : 'text-gray-600 hover:text-[#0f172a]'}`}
-                >
-                  {link.label}
-                </button>
-              );
-            })}
-
-            {/* Blog in mobile */}
-            <button
-              onClick={() => {
-                navigate(blogLink.to);
-                goToBlog();
-              }}
-              className={`text-left font-medium py-2.5 ${isBlogActive ? 'text-[#0f172a] font-semibold' : 'text-gray-600 hover:text-[#0f172a]'}`}
+        <div className="lg:hidden h-[calc(100dvh-72px)] overflow-y-auto bg-paper px-6 pt-6 pb-10 flex flex-col">
+          <nav className="flex flex-col" aria-label="Mobile">
+            {scrollNavLinks.map((link, i) => (
+              <button
+                key={link.id}
+                onClick={() => scrollToSection(link.id)}
+                className="hero-in text-left font-display text-[34px] leading-none py-4 border-b border-line text-ink flex justify-between items-center"
+                style={{ '--d': `${i * 60}ms` } as React.CSSProperties}
+              >
+                {link.label}
+                <ArrowUpRight className="w-5 h-5 text-ink-soft" />
+              </button>
+            ))}
+            <Link
+              to="/blog"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="hero-in text-left font-display text-[34px] leading-none py-4 border-b border-line text-ink flex justify-between items-center"
+              style={{ '--d': `${scrollNavLinks.length * 60}ms` } as React.CSSProperties}
             >
-              {blogLink.label}
-            </button>
+              Blog
+              <ArrowUpRight className="w-5 h-5 text-ink-soft" />
+            </Link>
           </nav>
 
-          <Link
-            to="/#contact"
-            onClick={() => scrollToSection('contact')}
-            className="mt-3 block w-full text-center bg-[#0f172a] text-white text-sm font-semibold py-3 rounded-lg hover:bg-[#0f172a] transition"
-          >
-            Book a Consultation
-          </Link>
+          <button onClick={() => scrollToSection('contact')} className="btn-primary mt-8 w-full">
+            Book a consultation
+            <ArrowUpRight className="arrow w-4 h-4" />
+          </button>
 
-          <div className="flex items-center gap-4 pt-4 mt-4 border-t border-gray-100 text-sm">
-            <a href="https://www.linkedin.com/in/-nisha-sharma/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#0f172a]">
-              <Linkedin size={17} />
+          <div className="mt-auto pt-10 flex items-center gap-5 text-ink-soft">
+            {socials.map(({ href, label, icon: Icon }) => (
+              <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="hover:text-ink">
+                <Icon size={20} />
+              </a>
+            ))}
+            <a href="https://medium.com/@nishashrm75" target="_blank" rel="noopener noreferrer" className="hover:text-ink font-bold" aria-label="Medium">
+              M
             </a>
-            <a href="https://x.com/nishashrm75" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#0f172a]">
-              <Twitter size={17} />
-            </a>
-            <a href="https://youtube.com/@finsightswithnisha" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#0f172a]">
-              <Youtube size={17} />
-            </a>
-            <a href="https://medium.com/@nishashrm75" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#0f172a] font-bold text-[13px]" title="Medium">M</a>
           </div>
         </div>
       )}

@@ -215,6 +215,7 @@ const AdminMessages = () => {
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
             </button>
             <RouterLink to="/meadminblogs" className="text-sm text-[#0e7490] hover:underline">Manage Articles</RouterLink>
+              <RouterLink to="/meadmindeadlines" className="text-sm text-[#0e7490] hover:underline">Deadlines</RouterLink>
             <button onClick={handleLogout} className="text-sm text-red-600 hover:underline">Logout</button>
           </div>
         </div>

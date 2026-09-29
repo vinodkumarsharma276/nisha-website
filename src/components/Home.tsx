@@ -1,119 +1,182 @@
-import { ArrowRight, Star, Users, CheckCircle, Calculator, FileText, Receipt, Building2, Shield, BarChart3 } from 'lucide-react';
+import { useEffect, useRef, type CSSProperties } from 'react';
+import { ArrowRight, CheckCircle2, FileCheck2, Receipt, Star } from 'lucide-react';
+import { hasFinePointer, useMotionTier } from '../lib/motion';
+
+// Generic workspace photo (Unsplash licence — free to use, no attribution required).
+const heroPhoto = 'https://images.unsplash.com/photo-1588091210060-1ee4fab270ae';
+const heroSrc = (w: number) => `${heroPhoto}?w=${w}&q=75&auto=format&fit=crop&crop=entropy&ar=4:5`;
+
+// Headline split into words so each can rise from a mask. `em` words get the accent colour.
+const headline: { w: string; em?: boolean; br?: boolean }[] = [
+  { w: 'Tax' },
+  { w: '&' },
+  { w: 'compliance,', br: true },
+  { w: 'handled' },
+  { w: 'with' },
+  { w: 'care', em: true },
+  { w: '&' },
+  { w: 'precision.', em: true },
+];
+
+const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 
 const Home = () => {
-  const scrollToContact = () => {
-    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const tier = useMotionTier();
+  const stageRef = useRef<HTMLDivElement>(null);
 
-  const scrollToServices = () => {
-    document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
-  };
+  // Pointer parallax on the photo stack — only on capable devices with a mouse.
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage || tier !== 'full' || !hasFinePointer()) return;
+    let raf = 0;
+    const onMove = (e: PointerEvent) => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const r = stage.getBoundingClientRect();
+        const x = (e.clientX - (r.left + r.width / 2)) / r.width;
+        const y = (e.clientY - (r.top + r.height / 2)) / r.height;
+        stage.style.setProperty('--px', x.toFixed(3));
+        stage.style.setProperty('--py', y.toFixed(3));
+      });
+    };
+    const reset = () => {
+      stage.style.setProperty('--px', '0');
+      stage.style.setProperty('--py', '0');
+    };
+    window.addEventListener('pointermove', onMove, { passive: true });
+    document.addEventListener('pointerleave', reset);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerleave', reset);
+    };
+  }, [tier]);
 
-  const scrollToBackground = () => {
-    document.getElementById('experience')?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const layer = (depth: number): CSSProperties => ({
+    transform: `translate3d(calc(var(--px, 0) * ${depth}px), calc(var(--py, 0) * ${depth}px), 0)`,
+    transition: 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)',
+  });
 
   return (
-    <section id="home" className="min-h-[100dvh] flex items-center bg-gradient-to-br from-[#f1f5f9] to-[#e0e7ff] pt-16">
-      <div className="container mx-auto px-4 sm:px-6 py-12 lg:py-20">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16">
-          {/* Left Content */}
-          <div className="lg:w-1/2 text-center lg:text-left max-w-2xl mx-auto lg:mx-0">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white shadow-sm border border-gray-100 mb-6">
-              <span className="w-2 h-2 bg-[#0e7490] rounded-full animate-pulse" />
-              <span className="text-[#0e7490] font-semibold text-sm tracking-[1.5px] uppercase">CA Aspirant • Tax • GST • Compliance</span>
-            </div>
+    <section id="home" className="relative overflow-hidden bg-paper grain pt-[72px]">
+      {/* Background: grid + drifting colour blobs (blobs render only on capable devices) */}
+      <div className="absolute inset-0 bg-grid pointer-events-none" aria-hidden />
+      <div className="blob w-[420px] h-[420px] bg-[#bfe3da] -top-24 right-[8%]" aria-hidden />
+      <div className="blob w-[360px] h-[360px] bg-[#f3dfbd] bottom-0 left-[-6%] [animation-delay:-6s]" aria-hidden />
 
-            <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-bold text-[#0f172a] leading-[1.05] tracking-[-1.5px] mb-6">
-              Reliable tax, GST<br className="hidden sm:block" /> &amp; accounting support<br className="hidden lg:block" /> you can trust.
-            </h1>
-
-            <p className="text-lg sm:text-xl text-gray-600 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
-              I help individuals and growing businesses with accurate ITR filing, GST compliance, tax planning, and company registrations — with clear pricing and personal attention.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mb-10">
-              <button
-                onClick={scrollToContact}
-                className="w-full sm:w-auto bg-[#0f172a] text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-[#0f172a] active:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#0f172a]/20 hover:shadow-xl"
-              >
-                Book a Consultation
-                <ArrowRight className="w-4 h-4" />
-              </button>
-              <button
-                onClick={scrollToServices}
-                className="w-full sm:w-auto border border-[#0f172a]/80 text-[#0f172a] hover:bg-[#0f172a] hover:text-white px-7 py-3.5 rounded-xl font-medium transition-all flex items-center justify-center gap-2"
-              >
-                View Services
-              </button>
-              <button
-                onClick={scrollToBackground}
-                className="w-full sm:w-auto text-sm font-medium text-gray-600 hover:text-[#0f172a] px-3 py-3 transition-colors"
-              >
-                See my background
-              </button>
-            </div>
-
-            {/* Trust Stats — inspired by top advisor sites */}
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200">
-              <div className="text-center lg:text-left">
-                <div className="flex items-center justify-center lg:justify-start text-[#0f172a] mb-1">
-                  <Star className="w-4 h-4 text-[#0e7490] mr-1.5" />
-                  <span className="text-2xl font-bold">2+</span>
-                </div>
-                <p className="text-sm text-gray-500">Years Hands-On</p>
-              </div>
-              <div className="text-center lg:text-left">
-                <div className="flex items-center justify-center lg:justify-start text-[#0f172a] mb-1">
-                  <Users className="w-4 h-4 text-[#0e7490] mr-1.5" />
-                  <span className="text-2xl font-bold">100+</span>
-                </div>
-                <p className="text-sm text-gray-500">Clients Served</p>
-              </div>
-              <div className="text-center lg:text-left">
-                <div className="flex items-center justify-center lg:justify-start text-[#0f172a] mb-1">
-                  <CheckCircle className="w-4 h-4 text-[#0e7490] mr-1.5" />
-                  <span className="text-2xl font-bold">100%</span>
-                </div>
-                <p className="text-sm text-gray-500">Compliance Focus</p>
-              </div>
-            </div>
+      <div className="relative max-w-7xl mx-auto px-5 sm:px-8 pt-10 pb-16 lg:pt-16 lg:pb-24 grid lg:grid-cols-12 gap-14 lg:gap-8 items-center min-h-[calc(100dvh-72px)]">
+        {/* Copy */}
+        <div className="lg:col-span-7">
+          <div className="hero-in inline-flex items-center gap-2.5 rounded-full border border-line bg-white/70 backdrop-blur px-3.5 py-1.5 text-[13px] text-ink-soft" style={{ '--d': '0ms' } as CSSProperties}>
+            <span className="ping relative inline-block w-2 h-2 rounded-full bg-emerald-500" />
+            Accepting new clients · Delhi
           </div>
 
-          {/* Right: Relevant Visual - Core CA Services */}
-          <div className="lg:w-1/2 flex justify-center">
-            <div className="w-full max-w-[420px]">
-              <div className="text-center mb-4">
-                <span className="inline-block text-xs font-semibold tracking-[2px] text-[#0e7490] uppercase">Core Expertise</span>
-              </div>
+          <h1 className="font-display text-ink mt-7 text-[44px] leading-[1.02] sm:text-[64px] lg:text-[80px] tracking-[-0.03em]">
+            {headline.map((part, i) => (
+              <span key={i}>
+                <span className="word-mask">
+                  <span className={`word ${part.em ? 'serif-accent' : ''}`} style={{ '--i': i } as CSSProperties}>
+                    {part.w}
+                  </span>
+                </span>
+                {part.br ? <br className="hidden sm:block" /> : ' '}
+              </span>
+            ))}
+          </h1>
 
-              <div className="grid grid-cols-3 gap-3 sm:gap-4">
-                {[
-                  { icon: Calculator, label: 'Accounting', desc: 'Bookkeeping & reports' },
-                  { icon: FileText, label: 'ITR Filing', desc: 'Individuals & business' },
-                  { icon: Receipt, label: 'GST Services', desc: 'Registration & returns' },
-                  { icon: Shield, label: 'Compliance', desc: 'Audits & regulations' },
-                  { icon: Building2, label: 'Company Reg.', desc: 'Incorporation & setup' },
-                  { icon: BarChart3, label: 'Tax Planning', desc: 'Optimization & savings' },
-                ].map((item, index) => {
-                  const Icon = item.icon;
-                  return (
-                    <div 
-                      key={index} 
-                      className="group bg-white border border-gray-100 hover:border-[#0e7490]/20 rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center transition-all hover:shadow-sm"
-                    >
-                      <div className="w-11 h-11 rounded-xl bg-[#e0e7ff] group-hover:bg-[#0e7490] flex items-center justify-center mb-3 transition-colors">
-                        <Icon className="w-5 h-5 text-[#0e7490] group-hover:text-white transition-colors" />
-                      </div>
-                      <div className="font-semibold text-[#0f172a] text-sm mb-0.5">{item.label}</div>
-                      <div className="text-[11px] text-gray-500 leading-tight">{item.desc}</div>
-                    </div>
-                  );
-                })}
-              </div>
+          <p className="hero-in mt-7 max-w-xl text-lg sm:text-xl leading-relaxed text-ink-soft" style={{ '--d': '550ms' } as CSSProperties}>
+            I'm Nisha — I help individuals and growing businesses file ITR, stay GST-compliant, plan taxes and register companies.
+            Clear pricing, no jargon, and one person who actually knows your file.
+          </p>
 
-              <div className="text-center mt-4 text-[11px] text-gray-500">
-                Transparent pricing • Fast turnaround
+          <div className="hero-in mt-9 flex flex-col sm:flex-row gap-3" style={{ '--d': '680ms' } as CSSProperties}>
+            <button onClick={() => scrollTo('contact')} className="btn-primary">
+              Book a free consultation
+              <ArrowRight className="arrow w-4 h-4" />
+            </button>
+            <button onClick={() => scrollTo('services')} className="btn-ghost">
+              Explore services
+            </button>
+          </div>
+
+          {/* Credentials strip */}
+          <div className="hero-in mt-12 pt-7 border-t border-line flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8" style={{ '--d': '800ms' } as CSSProperties}>
+            <p className="text-[11px] tracking-[0.18em] uppercase text-ink-soft/80 shrink-0">Articleship trained at</p>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 font-display text-[19px] text-ink/80">
+              <span>Akas &amp; Associates</span>
+              <span className="hidden sm:block w-1 h-1 rounded-full bg-ink/30" />
+              <span>V D Tiwari &amp; Co.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Portrait stage */}
+        <div ref={stageRef} className="lg:col-span-5 relative mx-auto w-full max-w-[440px]">
+          <div className="hero-in relative" style={{ '--d': '250ms' } as CSSProperties}>
+            {/* Decorative arch outline behind the photo */}
+            <div className="absolute -inset-3 sm:-inset-4 rounded-t-[999px] rounded-b-[32px] border border-accent/25" style={layer(-10)} aria-hidden />
+
+            <div className="relative aspect-[4/5] rounded-t-[999px] rounded-b-[28px] overflow-hidden bg-sand shadow-[0_40px_80px_-40px_rgba(11,31,51,0.55)]" style={layer(8)}>
+              <img
+                src={heroSrc(800)}
+                srcSet={`${heroSrc(480)} 480w, ${heroSrc(800)} 800w, ${heroSrc(1200)} 1200w`}
+                sizes="(min-width: 1024px) 440px, 90vw"
+                alt="A tidy desk with a laptop, notebook and coffee"
+                width={800}
+                height={1000}
+                fetchPriority="high"
+                className="w-full h-full object-cover scale-[1.04]"
+              />
+              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink/35 to-transparent" />
+            </div>
+
+            {/* Rotating badge */}
+            <div className="absolute -top-4 -right-2 sm:-right-8 w-[104px] h-[104px] sm:w-[118px] sm:h-[118px]" style={layer(22)} aria-hidden>
+              <div className="relative w-full h-full rounded-full bg-ink text-paper flex items-center justify-center shadow-xl">
+                <svg viewBox="0 0 100 100" className="spin-slow absolute inset-0 w-full h-full">
+                  <defs>
+                    <path id="badge-circle" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0" />
+                  </defs>
+                  <text fontSize="8.6" letterSpacing="2" fill="currentColor" className="uppercase" style={{ fontFamily: 'Inter', fontWeight: 600 }}>
+                    <textPath href="#badge-circle">Tax · GST · Audit · Compliance ·</textPath>
+                  </text>
+                </svg>
+                <Star className="w-6 h-6 text-[#e7c27d]" fill="currentColor" />
+              </div>
+            </div>
+
+            {/* Floating status chips */}
+            <div className="absolute top-[22%] -left-4 sm:-left-14" style={layer(28)}>
+              <div className="float-a flex items-center gap-3 rounded-2xl bg-white/95 backdrop-blur border border-line px-4 py-3 shadow-[0_18px_40px_-20px_rgba(11,31,51,0.45)]">
+                <span className="w-9 h-9 rounded-xl bg-accent-soft text-accent flex items-center justify-center">
+                  <FileCheck2 className="w-[18px] h-[18px]" />
+                </span>
+                <span>
+                  <span className="block text-[13px] font-semibold text-ink">ITR filed</span>
+                  <span className="block text-[11.5px] text-ink-soft">Acknowledgement received</span>
+                </span>
+              </div>
+            </div>
+
+            <div className="absolute bottom-[16%] -right-3 sm:-right-12" style={layer(34)}>
+              <div className="float-b flex items-center gap-3 rounded-2xl bg-white/95 backdrop-blur border border-line px-4 py-3 shadow-[0_18px_40px_-20px_rgba(11,31,51,0.45)]">
+                <span className="w-9 h-9 rounded-xl bg-[#fbf1dd] text-gold flex items-center justify-center">
+                  <Receipt className="w-[18px] h-[18px]" />
+                </span>
+                <span>
+                  <span className="block text-[13px] font-semibold text-ink">GSTR-3B</span>
+                  <span className="flex items-center gap-1 text-[11.5px] text-emerald-700">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Filed before due date
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <div className="absolute -bottom-6 left-4 sm:-left-6" style={layer(18)}>
+              <div className="float-c rounded-2xl bg-ink text-paper px-5 py-3.5 shadow-[0_18px_40px_-18px_rgba(11,31,51,0.7)]">
+                <span className="block font-display text-3xl leading-none">100+</span>
+                <span className="block text-[11.5px] text-paper/70 mt-1">clients served</span>
               </div>
             </div>
           </div>

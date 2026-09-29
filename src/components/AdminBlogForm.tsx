@@ -360,6 +360,7 @@ const AdminBlogForm: React.FC = () => {
                 + Add New Blog
               </button>
               <RouterLink to="/meadminmessages" className="text-sm text-[#0e7490] hover:underline">Messages</RouterLink>
+              <RouterLink to="/meadmindeadlines" className="text-sm text-[#0e7490] hover:underline">Deadlines</RouterLink>
               <button onClick={handleLogout} className="text-sm text-red-600 hover:underline">Logout</button>
             </div>
           </div>

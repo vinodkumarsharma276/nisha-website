@@ -92,3 +92,46 @@ drop policy if exists "Admin can delete contact messages" on public.contact_mess
 create policy "Admin can delete contact messages"
   on public.contact_messages for delete to authenticated
   using (auth.uid() = 'b71d27e8-76dc-4dc0-875b-aa889f417892'::uuid);
+
+-- ============================================================================
+-- Compliance deadlines (home page "Compliance calendar", edited at /meadmindeadlines)
+-- ============================================================================
+create table if not exists public.compliance_deadlines (
+  id            bigint primary key generated always as identity,
+  title         text not null,
+  who           text not null default '',
+  kind          text not null default 'Other'
+                check (kind in ('GST', 'Income Tax', 'TDS', 'Other')),
+  due_date      date not null,
+  original_date date,          -- set when a deadline is extended: the date it was originally due
+  note          text,
+  created_at    timestamptz default now()
+);
+
+create index if not exists compliance_deadlines_due_date_idx
+  on public.compliance_deadlines (due_date);
+
+alter table public.compliance_deadlines enable row level security;
+
+-- Public (anon key) can READ deadlines — powers the home page calendar.
+drop policy if exists "Public can read deadlines" on public.compliance_deadlines;
+create policy "Public can read deadlines"
+  on public.compliance_deadlines for select
+  using (true);
+
+-- Only the admin user can WRITE.
+drop policy if exists "Admin can insert deadlines" on public.compliance_deadlines;
+create policy "Admin can insert deadlines"
+  on public.compliance_deadlines for insert to authenticated
+  with check (auth.uid() = 'b71d27e8-76dc-4dc0-875b-aa889f417892'::uuid);
+
+drop policy if exists "Admin can update deadlines" on public.compliance_deadlines;
+create policy "Admin can update deadlines"
+  on public.compliance_deadlines for update to authenticated
+  using (auth.uid() = 'b71d27e8-76dc-4dc0-875b-aa889f417892'::uuid)
+  with check (auth.uid() = 'b71d27e8-76dc-4dc0-875b-aa889f417892'::uuid);
+
+drop policy if exists "Admin can delete deadlines" on public.compliance_deadlines;
+create policy "Admin can delete deadlines"
+  on public.compliance_deadlines for delete to authenticated
+  using (auth.uid() = 'b71d27e8-76dc-4dc0-875b-aa889f417892'::uuid);

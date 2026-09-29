@@ -1,143 +1,161 @@
-import { FileText, Shield, Receipt, Building, CheckCircle, ArrowRight, Award, Users, Clock } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, Check, Clock, FileText, Receipt, ShieldCheck, Building2, Plus } from 'lucide-react';
+import SectionHeading from './ui/SectionHeading';
+import Reveal from './ui/Reveal';
 
 const services = [
   {
     id: 'itr',
-    title: 'Income Tax Return (ITR)',
-    description: 'Comprehensive ITR filing services for individuals and businesses with expert guidance and maximum refund optimization.',
+    title: 'Income Tax Returns',
+    summary: 'Accurate ITR filing for salaried individuals, freelancers and businesses — with every eligible deduction claimed.',
     icon: FileText,
-    features: [
-      'Individual & Business ITR Filing',
-      'Tax Planning & Optimization',
-      'Refund Processing Support',
-      'Assessment & Appeals'
-    ],
-    price: 'Starting from ₹1,500',
-    duration: '2-3 business days',
+    features: ['Individual & business ITR filing', 'Tax planning & optimisation', 'Refund processing support', 'Assessments & appeals'],
+    price: '₹1,500',
+    priceNote: 'starting',
+    duration: '2–3 business days',
   },
   {
-    id: 'tax-audit',
-    title: 'Tax Audit',
-    description: 'Professional tax audit services ensuring compliance with regulatory requirements and identifying optimization opportunities.',
-    icon: Shield,
-    features: [
-      'Statutory Tax Audits',
-      'Internal Tax Reviews',
-      'Compliance Assessment',
-      'Risk Management'
-    ],
-    price: 'Starting from ₹15,000',
-    duration: '1-2 weeks',
-  },
-  {
-    id: 'gst-filing',
-    title: 'GST Filing',
-    description: 'End-to-end GST compliance services including registration, return filing, and ongoing support for seamless operations.',
+    id: 'gst',
+    title: 'GST Registration & Filing',
+    summary: 'End-to-end GST compliance — registration, monthly or quarterly returns and input tax credit reconciliation.',
     icon: Receipt,
-    features: [
-      'GST Registration & Setup',
-      'Monthly/Quarterly Returns',
-      'Input Tax Credit Optimization',
-      'GST Compliance Management'
-    ],
-    price: 'Starting from ₹2,500/month',
+    features: ['GST registration & setup', 'Monthly / quarterly returns', 'Input tax credit optimisation', 'Ongoing compliance management'],
+    price: '₹2,500',
+    priceNote: 'per month',
     duration: 'Ongoing support',
   },
   {
-    id: 'company-registration',
+    id: 'audit',
+    title: 'Tax Audit',
+    summary: 'Statutory tax audits and internal reviews that keep you compliant and surface savings you might be missing.',
+    icon: ShieldCheck,
+    features: ['Statutory tax audits', 'Internal tax reviews', 'Compliance assessment', 'Risk management'],
+    price: '₹15,000',
+    priceNote: 'starting',
+    duration: '1–2 weeks',
+  },
+  {
+    id: 'company',
     title: 'Company Registration',
-    description: 'Complete company incorporation services with legal compliance, documentation, and post-registration support.',
-    icon: Building,
-    features: [
-      'Private Limited Company Setup',
-      'LLP & Partnership Registration',
-      'Documentation & Compliance',
-      'Post-Registration Support'
-    ],
-    price: 'Starting from ₹8,000',
-    duration: '7-10 business days',
-  }
-];
-
-const whyChooseUs = [
-  { icon: Award, title: 'Skilled Professional', description: '2+ years of hands-on experience' },
-  { icon: Users, title: '200+ Satisfied Clients', description: 'Trusted by businesses across India' },
-  { icon: Clock, title: 'Quick Turnaround', description: 'Fast, reliable, and on-time delivery' },
-  { icon: CheckCircle, title: '100% Compliance', description: 'Error-free filing every time' }
+    summary: 'Private limited, LLP and partnership incorporation with all documentation and post-registration compliance handled.',
+    icon: Building2,
+    features: ['Private limited company setup', 'LLP & partnership registration', 'Documentation & compliance', 'Post-registration support'],
+    price: '₹8,000',
+    priceNote: 'starting',
+    duration: '7–10 business days',
+  },
 ];
 
 const Services = () => {
-  const scrollToContact = () => {
-    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const [open, setOpen] = useState<string>('itr');
 
   return (
-    <section id="services" className="py-20 bg-white">
-      <div className="container mx-auto px-4 sm:px-6">
-        {/* Header */}
-        <div className="text-center mb-12 sm:mb-16">
-          <p className="text-[#0e7490] font-semibold text-sm tracking-widest uppercase mb-3">What I Offer</p>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0f172a] mb-4">
-            Professional Services
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Clear pricing. Fast turnaround. Complete compliance. Services designed so you can focus on growing your business.
-          </p>
+    <section id="services" className="bg-sand/60 py-24 lg:py-32 border-y border-line">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8">
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-14 lg:mb-20">
+          <SectionHeading
+            eyebrow="Services"
+            title={
+              <>
+                Everything your taxes need, <em>in one place.</em>
+              </>
+            }
+          />
+          <Reveal delay={200} className="lg:max-w-sm">
+            <p className="text-ink-soft leading-relaxed">
+              Transparent starting prices, realistic timelines and complete compliance — so you can focus on your work, not the paperwork.
+            </p>
+          </Reveal>
         </div>
 
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-16 sm:mb-20">
-          {services.map((service) => (
-            <div
-              key={service.id}
-              className="bg-white border border-gray-200 rounded-2xl p-6 card-hover hover:border-[#0e7490]/20 group"
-            >
-              <div className="w-12 h-12 bg-[#e0e7ff] rounded-lg flex items-center justify-center mb-4 group-hover:bg-[#0e7490] transition-colors">
-                <service.icon className="w-6 h-6 text-[#0e7490] group-hover:text-white transition-colors" />
-              </div>
+        <div className="border-t border-ink/15">
+          {services.map((s, i) => {
+            const isOpen = open === s.id;
+            const Icon = s.icon;
+            return (
+              <Reveal key={s.id} delay={i * 80} className="border-b border-ink/15">
+                <button
+                  onClick={() => setOpen(isOpen ? '' : s.id)}
+                  aria-expanded={isOpen}
+                  aria-controls={`svc-${s.id}`}
+                  className="group w-full text-left py-7 sm:py-9 grid grid-cols-[auto_1fr_auto] items-center gap-4 sm:gap-8"
+                >
+                  <span className="font-display text-sm sm:text-base text-ink-soft/70 tabular-nums w-7">0{i + 1}</span>
+                  <span className="min-w-0">
+                    <span
+                      className={`block font-display text-[28px] sm:text-[44px] lg:text-[56px] leading-[1.05] tracking-[-0.02em] transition-all duration-500 ${
+                        isOpen ? 'text-accent' : 'text-ink group-hover:translate-x-2'
+                      }`}
+                    >
+                      {s.title}
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-4 sm:gap-6">
+                    <span className="hidden md:block text-right">
+                      <span className="block font-display text-2xl text-ink">{s.price}</span>
+                      <span className="block text-xs text-ink-soft">{s.priceNote}</span>
+                    </span>
+                    <span
+                      className={`w-11 h-11 sm:w-14 sm:h-14 rounded-full border flex items-center justify-center transition-all duration-500 ${
+                        isOpen ? 'bg-ink border-ink text-paper rotate-45' : 'border-ink/20 text-ink group-hover:bg-ink group-hover:text-paper group-hover:border-ink'
+                      }`}
+                    >
+                      <Plus className="w-5 h-5" />
+                    </span>
+                  </span>
+                </button>
 
-              <h3 className="text-lg font-semibold text-[#0f172a] mb-2">{service.title}</h3>
-              <p className="text-sm text-gray-500 mb-4 line-clamp-2">{service.description}</p>
-
-              <ul className="space-y-2 mb-5">
-                {service.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-start text-sm text-gray-600">
-                    <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="pt-4 border-t border-gray-100 space-y-1 mb-4">
-                <p className="text-sm"><span className="text-gray-400">Price:</span> <span className="font-semibold text-[#0f172a]">{service.price}</span></p>
-                <p className="text-sm"><span className="text-gray-400">Duration:</span> <span className="font-medium text-gray-700">{service.duration}</span></p>
-              </div>
-
-              <button
-                onClick={scrollToContact}
-                className="w-full py-2.5 border border-[#0f172a] text-[#0f172a] text-sm font-medium rounded-lg hover:bg-[#0f172a] hover:text-white transition-colors flex items-center justify-center gap-2"
-              >
-                Get Started <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
-        </div>
-
-        {/* Why Choose Us */}
-        <div className="bg-[#f8fafc] rounded-2xl p-6 sm:p-10 lg:p-14">
-          <h3 className="text-xl sm:text-2xl font-bold text-[#0f172a] text-center mb-8 sm:mb-10">Why Clients Choose to Work With Me</h3>
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
-            {whyChooseUs.map((item, index) => (
-              <div key={index} className="text-center">
-                <div className="w-14 h-14 bg-white rounded-xl shadow-sm flex items-center justify-center mx-auto mb-4 border border-gray-100">
-                  <item.icon className="w-7 h-7 text-[#0f172a]" />
+                <div id={`svc-${s.id}`} className={`acc-grid ${isOpen ? 'is-open' : ''}`}>
+                  <div className="overflow-hidden">
+                    <div className="pb-10 sm:pl-[60px] grid md:grid-cols-12 gap-8">
+                      <div className="md:col-span-5">
+                        <span className="w-12 h-12 rounded-2xl bg-white border border-line text-accent flex items-center justify-center mb-5">
+                          <Icon className="w-6 h-6" />
+                        </span>
+                        <p className="text-[17px] leading-relaxed text-ink-soft">{s.summary}</p>
+                        <div className="mt-5 flex flex-wrap gap-2 text-sm">
+                          <span className="md:hidden inline-flex items-center rounded-full bg-white border border-line px-3 py-1.5 font-semibold text-ink">
+                            {s.price} <span className="font-normal text-ink-soft ml-1">{s.priceNote}</span>
+                          </span>
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-white border border-line px-3 py-1.5 text-ink-soft">
+                            <Clock className="w-3.5 h-3.5" /> {s.duration}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="md:col-span-7 md:pl-8 md:border-l border-line flex flex-col">
+                        <p className="text-[11px] tracking-[0.18em] uppercase font-semibold text-ink-soft mb-4">What's included</p>
+                        <ul className="grid sm:grid-cols-2 gap-3">
+                          {s.features.map((f) => (
+                            <li key={f} className="flex items-start gap-3 rounded-xl bg-white/80 border border-line px-4 py-3 text-[15px] text-ink">
+                              <Check className="w-4 h-4 mt-0.5 text-accent shrink-0" strokeWidth={2.5} />
+                              {f}
+                            </li>
+                          ))}
+                        </ul>
+                        <button
+                          onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                          className="mt-6 self-start inline-flex items-center gap-2 text-[15px] font-semibold text-ink border-b border-ink pb-0.5 hover:text-accent hover:border-accent transition-colors"
+                        >
+                          Enquire about {s.title.toLowerCase()} <ArrowRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <h4 className="font-semibold text-[#0f172a] mb-1">{item.title}</h4>
-                <p className="text-sm text-gray-500">{item.description}</p>
-              </div>
-            ))}
-          </div>
+              </Reveal>
+            );
+          })}
         </div>
+
+        <Reveal className="mt-10 text-sm text-ink-soft">
+          Need something that isn't listed — bookkeeping, a tax notice, or advance-tax planning?{' '}
+          <button
+            onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+            className="font-semibold text-ink underline underline-offset-4 hover:text-accent"
+          >
+            Just ask.
+          </button>
+        </Reveal>
       </div>
     </section>
   );

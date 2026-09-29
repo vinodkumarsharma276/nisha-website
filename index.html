@@ -1,10 +1,35 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-motion="full">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CA-Nisha</title>
+    <meta name="theme-color" content="#faf8f4" />
+    <title>Nisha Sharma — Tax, GST &amp; Compliance | Delhi</title>
+    <meta
+      name="description"
+      content="Nisha Sharma helps individuals and growing businesses in Delhi with ITR filing, GST compliance, tax audit, tax planning and company registration — with clear pricing and personal attention."
+    />
+    <meta property="og:title" content="Nisha Sharma — Tax, GST & Compliance" />
+    <meta property="og:description" content="Accurate ITR filing, GST compliance and company registration with clear pricing and personal attention." />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1588091210060-1ee4fab270ae?w=1200&q=80&auto=format&fit=crop" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <script>
+      // Decide motion level before first paint so nothing flashes. Refined later by src/lib/motion.ts.
+      (function () {
+        try {
+          var d = document.documentElement, n = navigator, c = n.connection || {};
+          if (matchMedia('(prefers-reduced-motion: reduce)').matches) d.dataset.motion = 'none';
+          else if (c.saveData || (n.hardwareConcurrency || 8) <= 2 || (n.deviceMemory || 8) <= 2) d.dataset.motion = 'lite';
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

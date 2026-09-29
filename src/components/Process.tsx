@@ -1,69 +1,105 @@
-import { Calendar, Search, FileCheck, TrendingUp } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { CalendarCheck, Search, FileCheck2, TrendingUp } from 'lucide-react';
+import SectionHeading from './ui/SectionHeading';
+import Reveal from './ui/Reveal';
+import { useMotionTier } from '../lib/motion';
 
 const steps = [
   {
-    number: '01',
-    icon: Calendar,
-    title: 'Book & Understand',
-    description: 'We start with a focused consultation. I learn about your business, income sources, goals, and pain points.',
+    icon: CalendarCheck,
+    title: 'Book & understand',
+    description: 'A focused first conversation. I learn about your income sources, business, goals and anything that is worrying you.',
   },
   {
-    number: '02',
     icon: Search,
-    title: 'Review & Strategize',
-    description: 'I analyze your current setup, identify opportunities for tax optimization, compliance gaps, and create a clear action plan.',
+    title: 'Review & plan',
+    description: 'I review your current setup, spot tax-saving opportunities and compliance gaps, and share a clear plan with the fee upfront.',
   },
   {
-    number: '03',
-    icon: FileCheck,
-    title: 'Execute & File',
-    description: 'Accurate filing of ITR, GST returns, audits or registrations. All documentation handled with full transparency.',
+    icon: FileCheck2,
+    title: 'Execute & file',
+    description: 'Accurate filing of your ITR, GST returns, audit or registration — with every document shared and explained.',
   },
   {
-    number: '04',
     icon: TrendingUp,
-    title: 'Support & Optimize',
-    description: 'Year-round guidance, proactive planning, and quarterly check-ins so you never face surprises at tax time.',
+    title: 'Support all year',
+    description: 'Reminders before due dates, proactive planning and a real person to message, so tax season never becomes a surprise.',
   },
 ];
 
 const Process = () => {
+  const tier = useMotionTier();
+  const listRef = useRef<HTMLOListElement>(null);
+  const fillRef = useRef<HTMLDivElement>(null);
+
+  // Scroll-linked progress line (full motion only; otherwise it's drawn complete).
+  useEffect(() => {
+    const list = listRef.current;
+    const fill = fillRef.current;
+    if (!list || !fill) return;
+    if (tier !== 'full') {
+      fill.style.transform = 'scaleY(1)';
+      return;
+    }
+    let raf = 0;
+    const update = () => {
+      const r = list.getBoundingClientRect();
+      const start = window.innerHeight * 0.7;
+      const progress = Math.min(1, Math.max(0, (start - r.top) / r.height));
+      fill.style.transform = `scaleY(${progress})`;
+    };
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [tier]);
+
   return (
-    <section className="py-16 lg:py-20 bg-white border-t border-b border-gray-100">
-      <div className="container mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <p className="text-[#0e7490] font-semibold text-sm tracking-widest uppercase mb-3">Simple. Clear. Effective.</p>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0f172a] mb-3">How I Work With You</h2>
-          <p className="text-gray-600 max-w-md mx-auto">A transparent, step-by-step process used by hundreds of clients to stay compliant and stress-free.</p>
+    <section id="process" className="bg-paper py-24 lg:py-32">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 grid lg:grid-cols-12 gap-14">
+        <div className="lg:col-span-5">
+          <div className="lg:sticky lg:top-28">
+            <SectionHeading
+              eyebrow="How it works"
+              title={
+                <>
+                  Four simple steps. <em>Zero surprises.</em>
+                </>
+              }
+              intro="A transparent process from the first call to the final acknowledgement — you always know what's happening and what it costs."
+            />
+            <Reveal delay={240} className="mt-8">
+              <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="btn-primary">
+                Start with step one
+              </button>
+            </Reveal>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
-          {steps.map((step, index) => (
-            <div 
-              key={index} 
-              className="group bg-[#f1f5f9] rounded-2xl p-6 lg:p-7 border border-gray-100 hover:border-[#0e7490]/20 hover:-translate-y-0.5 transition-all duration-300 flex flex-col"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center border border-gray-100 group-hover:bg-[#0e7490] group-hover:border-[#0f172a] transition-colors">
-                  <step.icon className="w-6 h-6 text-[#0e7490] group-hover:text-white transition-colors" />
-                </div>
-                <span className="text-4xl font-bold text-gray-100 group-hover:text-[#e8e8e8] transition-colors">{step.number}</span>
-              </div>
+        <ol ref={listRef} className="lg:col-span-7 relative">
+          {/* Track + scroll-linked fill */}
+          <div className="absolute left-[27px] top-4 bottom-4 w-px bg-line" aria-hidden />
+          <div ref={fillRef} className="process-line absolute left-[27px] top-4 bottom-4 w-px bg-accent" style={{ transform: 'scaleY(0)' }} aria-hidden />
 
-              <h3 className="text-xl font-semibold text-[#0f172a] mb-3">{step.title}</h3>
-              <p className="text-sm text-gray-600 leading-relaxed flex-1">{step.description}</p>
-            </div>
+          {steps.map((step, i) => (
+            <Reveal as="li" key={step.title} delay={i * 100} className="relative pl-20 pb-14 last:pb-0">
+              <span className="absolute left-0 top-0 w-14 h-14 rounded-2xl bg-white border border-line text-accent flex items-center justify-center shadow-[0_10px_30px_-18px_rgba(11,31,51,0.4)]">
+                <step.icon className="w-6 h-6" />
+              </span>
+              <p className="font-display text-sm text-ink-soft/70">Step 0{i + 1}</p>
+              <h3 className="mt-1 font-display text-[28px] sm:text-[34px] leading-tight text-ink">{step.title}</h3>
+              <p className="mt-3 text-[16.5px] text-ink-soft leading-relaxed max-w-lg">{step.description}</p>
+            </Reveal>
           ))}
-        </div>
-
-        <div className="text-center mt-10">
-          <button 
-            onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-            className="text-sm font-medium text-[#0f172a] hover:text-[#0e7490] inline-flex items-center gap-1.5 transition-colors"
-          >
-            Ready to get started? <span className="underline">Let’s talk</span>
-          </button>
-        </div>
+        </ol>
       </div>
     </section>
   );
